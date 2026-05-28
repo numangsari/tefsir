@@ -1,0 +1,48 @@
+{
+  "name": "tefsir-projesi",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "scrape:ayahs": "tsx scripts/scrape-ayahs.ts",
+    "scrape:tafsirs": "tsx scripts/scrape-tafsirs.ts",
+    "scrape:translations": "tsx scripts/scrape-translations.ts",
+    "export:tafsirs": "tsx scripts/export-tafsirs.ts",
+    "modernize": "tsx scripts/modernize-tafsirs.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "cheerio": "^1.0.0",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
+    "iconv-lite": "^0.6.3",
+    "next": "15.0.3",
+    "next-auth": "^4.24.10",
+    "p-limit": "^6.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "resend": "^6.12.4",
+    "tailwind-merge": "^2.5.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.14.0",
+    "eslint-config-next": "15.0.3",
+    "postcss": "^8.4.49",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^3.4.14",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

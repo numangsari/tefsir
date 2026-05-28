@@ -1,0 +1,220 @@
+// Tefsir Projesi - veri modeli
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// 114 sure katalogu
+model Surah {
+  id          Int     @id // 1..114
+  nameTr      String  // "Fâtiha"
+  nameTrSlug  String  @unique // "fatiha"
+  nameAr      String  // "الفاتحة"
+  ayetCount   Int
+  revelationType String? // "mekki" | "medeni"
+  revelationOrder Int?    // nüzul sırası (1..114)
+  meaning      String? // ismin anlamı, kısa
+  ayahs       Ayah[]
+}
+
+// Her ayet: arapça metin ve Diyanet meali burada (Diyanet'i hızlı erişim için
+// burada tutuyoruz; diğer mealler Translation tablosunda)
+model Ayah {
+  id        Int    @id @default(autoincrement())
+  surahId   Int
+  number    Int    // sure içi ayet no, 1-based
+  arabic    String
+  meal      String // Diyanet meali
+
+  surah     Surah         @relation(fields: [surahId], references: [id])
+  contents  TafsirContent[]
+  translations Translation[]
+  highlights Highlight[]
+  notes     Note[]
+  tafsirReadMarks TafsirReadMark[]
+
+  @@unique([surahId, number])
+  @@index([surahId, number])
+}
+
+// Meal yazarı / sürümü kataloğu
+model TranslationEdition {
+  id         Int    @id @default(autoincrement())
+  code       String @unique // "tr.diyanet"
+  name       String // "Diyanet İşleri"
+  language   String // "tr"
+  isDefault  Boolean @default(false)
+
+  translations Translation[]
+}
+
+// Bir editörün bir ayet için Türkçe (veya başka dilde) meali
+model Translation {
+  id          Int    @id @default(autoincrement())
+  editionId   Int
+  ayahId      Int
+  text        String
+
+  edition  TranslationEdition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  ayah     Ayah               @relation(fields: [ayahId], references: [id], onDelete: Cascade)
+
+  @@unique([editionId, ayahId])
+  @@index([ayahId])
+}
+
+// 11 türkçe tefsirin katalogu (T001–T011)
+model Tafsir {
+  id        Int    @id
+  code      String @unique // "T001"
+  name      String // "Beydâvî Tefsiri"
+  author    String? // "Kâdî Beydâvî"
+  slug      String @unique // "beydavi"
+  order     Int    // gösterim sırası (kronolojik)
+  deathYearHijri Int? // ör. 685
+  deathYearGregorian Int? // ör. 1286
+
+  contents  TafsirContent[]
+  highlights Highlight[]
+  notes     Note[]
+  readMarks TafsirReadMark[]
+}
+
+// Bir tefsirin bir ayet hakkındaki metni
+// html/text: gösterilen (varsa sadeleştirilmiş) versiyon
+// originalHtml/originalText: ilk scrape edilen ham hali (yedek, kullanıcı geri dönebilir)
+// modernizedAt: AI ile sadeleştirildi mi, ne zaman
+// modernizedBy: hangi model ile (opsiyonel)
+model TafsirContent {
+  id        Int     @id @default(autoincrement())
+  tafsirId  Int
+  ayahId    Int
+  html      String  // gösterilecek HTML
+  text      String  // gösterilecek düz metin
+  charCount Int
+
+  originalHtml String  @default("") // ilk scrape — yedek
+  originalText String  @default("") // ilk scrape — yedek
+
+  modernizedAt DateTime? // AI sadeleştirme tarihi
+  modernizedBy String?   // model adı (örn. "meta-llama/llama-3.3-70b-instruct:free")
+
+  fetchedAt DateTime @default(now())
+
+  tafsir    Tafsir @relation(fields: [tafsirId], references: [id])
+  ayah      Ayah   @relation(fields: [ayahId], references: [id])
+
+  @@unique([tafsirId, ayahId])
+  @@index([ayahId])
+  @@index([tafsirId, modernizedAt])
+}
+
+// Kullanıcı
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  passwordHash  String
+  role          String   @default("USER") // USER veya ADMIN
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  // "burada kaldım"
+  bookmarkSurahId  Int?
+  bookmarkAyahNo   Int?
+  bookmarkTafsirId Int?
+  bookmarkAt       DateTime?
+
+  highlights        Highlight[]
+  notes             Note[]
+  tafsirReadMarks   TafsirReadMark[]
+  emailVerifications EmailVerification[]
+  passwordResets    PasswordReset[]
+}
+
+// E-posta doğrulama tokeni
+model EmailVerification {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+// Şifre sıfırlama tokeni
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+// Bir kullanıcının bir tefsir metni içindeki bir aralığa koyduğu vurgu
+model Highlight {
+  id        String   @id @default(cuid())
+  userId    String
+  tafsirId  Int
+  ayahId    Int
+  startOffset Int    // tefsir text'i içinde başlangıç karakter offset'i
+  endOffset Int      // bitiş offset'i (exclusive)
+  text      String   // vurgulanan metnin snapshot'ı (silinmiş gibi görünmeleri durumunda)
+  color     String   @default("yellow")
+  createdAt DateTime @default(now())
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tafsir    Tafsir  @relation(fields: [tafsirId], references: [id])
+  ayah      Ayah    @relation(fields: [ayahId], references: [id])
+
+  @@index([userId, ayahId])
+  @@index([userId, tafsirId, ayahId])
+}
+
+// Bir kullanıcının bir noktaya bıraktığı not
+model Note {
+  id        String   @id @default(cuid())
+  userId    String
+  tafsirId  Int
+  ayahId    Int
+  position  Int      // tefsir text'i içinde karakter offset'i (işaret konumu)
+  anchorText String  // not bırakılan civardaki ~40 karakterlik bağlam
+  body      String   // notun gövdesi
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tafsir    Tafsir  @relation(fields: [tafsirId], references: [id])
+  ayah      Ayah    @relation(fields: [ayahId], references: [id])
+
+  @@index([userId, ayahId])
+  @@index([userId, tafsirId, ayahId])
+}
+
+// Kullanıcının bir ayette bir tefsiri okudu işareti
+model TafsirReadMark {
+  id        String   @id @default(cuid())
+  userId    String
+  tafsirId  Int
+  ayahId    Int
+  readAt    DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tafsir Tafsir @relation(fields: [tafsirId], references: [id])
+  ayah   Ayah   @relation(fields: [ayahId], references: [id])
+
+  @@unique([userId, tafsirId, ayahId])
+  @@index([userId, ayahId])
+}

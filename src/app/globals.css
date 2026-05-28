@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #fafaf9; /* stone-50 */
+  color: #1c1917;     /* stone-900 */
+}
+.dark body {
+  background: #0c0a09; /* stone-950 */
+  color: #e7e5e4;     /* stone-200 */
+}
+
+.arabic {
+  direction: rtl;
+  font-family: "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif;
+  font-size: 1.85rem;
+  line-height: 2.8rem;
+  text-align: right;
+}
+
+.tefsir-body p { margin: 0.75rem 0; }
+.tefsir-body {
+  font-size: var(--tafsir-font-size, 1.05rem);
+  line-height: var(--tafsir-line-height, 1.85);
+}
+
+.hl {
+  border-radius: 1px;
+  padding: 0 1px 1px;
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: #16a34a; /* green-600 */
+  text-underline-offset: 2px;
+  background-color: rgba(34, 197, 94, 0.12);
+}
+
+.hl-yellow,
+.hl-green,
+.hl-blue,
+.hl-pink {
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: #16a34a;
+  text-underline-offset: 2px;
+  background-color: rgba(34, 197, 94, 0.12);
+}
+
+.dark .hl,
+.dark .hl-yellow,
+.dark .hl-green,
+.dark .hl-blue,
+.dark .hl-pink {
+  text-decoration-color: #4ade80; /* green-400 */
+  background-color: rgba(34, 197, 94, 0.18);
+}
+
+.note-inline {
+  display: inline;
+  font-style: italic;
+  color: #047857;       /* emerald-700 */
+  opacity: 0.65;
+  margin-left: 2px;
+  cursor: pointer;
+}
+.dark .note-inline {
+  color: #6ee7b7;       /* emerald-300 */
+  opacity: 0.7;
+}
+.note-inline:hover {
+  opacity: 1;
+}
+
+@keyframes toast-in {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-toast { animation: toast-in 200ms ease-out; }
+
+/* Yazdır görünümünde tema bağımsız beyaz */
+@media print {
+  html, body { background: white !important; color: black !important; }
+}
