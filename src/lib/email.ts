@@ -1,12 +1,16 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend() {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
 const FROM = "tefsir.net <noreply@tefsir.net>";
 const BASE_URL = process.env.NEXTAUTH_URL ?? "https://tefsir.net";
 
 export async function sendVerificationEmail(email: string, token: string) {
   const url = `${BASE_URL}/emaili-dogrula?token=${token}`;
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: email,
     subject: "tefsir.net — E-posta adresinizi doğrulayın",
@@ -21,7 +25,7 @@ export async function sendVerificationEmail(email: string, token: string) {
 
 export async function sendPasswordResetEmail(email: string, token: string) {
   const url = `${BASE_URL}/sifre-sifirla/${token}`;
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: email,
     subject: "tefsir.net — Şifre sıfırlama",
