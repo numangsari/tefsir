@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 // Tüm vurgu ve notlar — kullanıcı paneli için
 // Query parametreleri: ?surahId=&tafsirId=
 import { NextRequest, NextResponse } from "next/server";
