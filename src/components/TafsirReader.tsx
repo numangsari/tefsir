@@ -453,7 +453,10 @@ export function TafsirReader({
               onSelectionChange={setActiveSelection}
               onHighlightClick={deleteHighlight}
               onNoteClick={(n) => setEditingNote(n)}
-              onAddNoteAt={(position, anchorText) => setDraftNote({ position, anchorText })}
+              onAddNoteAt={(position, anchorText) => {
+                if (!requireAuth()) return;
+                setDraftNote({ position, anchorText });
+              }}
               hiddenNoteIds={hiddenNoteIds}
               onToggleNoteHidden={toggleNoteHidden}
               focusHighlightId={focusHighlightId}
