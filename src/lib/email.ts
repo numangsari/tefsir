@@ -9,7 +9,7 @@ const FROM = "tefsir.net <noreply@tefsir.net>";
 const BASE_URL = process.env.NEXTAUTH_URL ?? "https://tefsir.net";
 
 export async function sendVerificationEmail(email: string, token: string) {
-  const url = `${BASE_URL}/emaili-dogrula?token=${token}`;
+  const url = `${BASE_URL}/api/auth/verify-email?token=${token}`;
   await getResend().emails.send({
     from: FROM,
     to: email,
