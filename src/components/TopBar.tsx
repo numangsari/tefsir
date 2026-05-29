@@ -7,9 +7,11 @@ import { useTheme } from "./ThemeProvider";
 export function TopBar({
   userName,
   role,
+  isGuest = false,
 }: {
-  userName: string;
+  userName?: string;
   role?: string;
+  isGuest?: boolean;
 }) {
   const { theme, toggle } = useTheme();
   const [open, setOpen] = useState(false);
@@ -48,12 +50,16 @@ export function TopBar({
         <Link href="/oku" className="px-2 py-1 rounded hover:bg-emerald-700">
           Tefsir Oku
         </Link>
-        <Link href="/panel" className="px-2 py-1 rounded hover:bg-emerald-700">
-          Notlarım
-        </Link>
-        <Link href="/profil" className="px-2 py-1 rounded hover:bg-emerald-700">
-          Hesabım
-        </Link>
+        {!isGuest && (
+          <Link href="/panel" className="px-2 py-1 rounded hover:bg-emerald-700">
+            Notlarım
+          </Link>
+        )}
+        {!isGuest && (
+          <Link href="/profil" className="px-2 py-1 rounded hover:bg-emerald-700">
+            Hesabım
+          </Link>
+        )}
         {role === "ADMIN" && (
           <Link href="/yonetici" className="px-2 py-1 rounded bg-amber-700 hover:bg-amber-600">
             Yönetici
@@ -67,7 +73,16 @@ export function TopBar({
         >
           {theme === "dark" ? "☀" : "☾"}
         </button>
-        <span className="opacity-80 ml-1 max-w-[160px] truncate">{userName}</span>
+        {isGuest ? (
+          <Link
+            href="/"
+            className="ml-1 px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 font-medium"
+          >
+            Giriş yap
+          </Link>
+        ) : (
+          <span className="opacity-80 ml-1 max-w-[160px] truncate">{userName}</span>
+        )}
       </nav>
 
       {/* Mobil */}
@@ -90,16 +105,23 @@ export function TopBar({
         {open && (
           <div className="absolute right-3 top-12 z-30 bg-emerald-800 dark:bg-emerald-950 border border-emerald-700 rounded-md shadow-lg min-w-[180px] py-1">
             <div className="px-3 py-1.5 text-xs text-emerald-200/80 border-b border-emerald-700">
-              {userName}
+              {isGuest ? "Misafir" : userName}
             </div>
             <MobileLink href="/arama" onClick={() => setOpen(false)} aria-label="Arama">
               ⌕ Arama
             </MobileLink>
             <MobileLink href="/oku" onClick={() => setOpen(false)}>Tefsir Oku</MobileLink>
-            <MobileLink href="/panel" onClick={() => setOpen(false)}>Notlarım</MobileLink>
-            <MobileLink href="/profil" onClick={() => setOpen(false)}>Hesabım</MobileLink>
+            {!isGuest && (
+              <MobileLink href="/panel" onClick={() => setOpen(false)}>Notlarım</MobileLink>
+            )}
+            {!isGuest && (
+              <MobileLink href="/profil" onClick={() => setOpen(false)}>Hesabım</MobileLink>
+            )}
             {role === "ADMIN" && (
               <MobileLink href="/yonetici" onClick={() => setOpen(false)}>Yönetici</MobileLink>
+            )}
+            {isGuest && (
+              <MobileLink href="/" onClick={() => setOpen(false)}>Giriş yap</MobileLink>
             )}
           </div>
         )}

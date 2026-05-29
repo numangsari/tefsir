@@ -91,6 +91,15 @@ export function AuthUnified({ defaultTab = "giris" }: { defaultTab?: AuthTab }) 
           </div>
 
           {tab === "giris" ? <LoginForm /> : <RegisterForm />}
+
+          <div className="mt-6 pt-5 border-t border-stone-200 dark:border-stone-800 text-center">
+            <Link
+              href="/oku"
+              className="text-sm text-stone-600 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-emerald-400"
+            >
+              Üye olmadan devam et →
+            </Link>
+          </div>
         </div>
       </section>
     </main>

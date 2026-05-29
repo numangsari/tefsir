@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { PrintView } from "./PrintView";
@@ -10,7 +10,6 @@ export default async function PrintPage({
 }) {
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id;
-  if (!userId) redirect(`/giris`);
 
   const { surah, ayah, tafsirId } = await params;
   const sId = parseInt(surah);
@@ -30,16 +29,18 @@ export default async function PrintPage({
   });
   if (!content) notFound();
 
-  const [highlights, notes] = await Promise.all([
-    prisma.highlight.findMany({
-      where: { userId, tafsirId: tId, ayahId: ayet.id },
-      orderBy: { startOffset: "asc" },
-    }),
-    prisma.note.findMany({
-      where: { userId, tafsirId: tId, ayahId: ayet.id },
-      orderBy: { position: "asc" },
-    }),
-  ]);
+  const [highlights, notes] = userId
+    ? await Promise.all([
+        prisma.highlight.findMany({
+          where: { userId, tafsirId: tId, ayahId: ayet.id },
+          orderBy: { startOffset: "asc" },
+        }),
+        prisma.note.findMany({
+          where: { userId, tafsirId: tId, ayahId: ayet.id },
+          orderBy: { position: "asc" },
+        }),
+      ])
+    : [[], []];
 
   return (
     <PrintView

@@ -10,6 +10,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { NotesPanel } from "./NotesPanel";
 import { AnnotationTools } from "./AnnotationTools";
 import { useToast } from "./Toaster";
+import { useRequireAuth } from "@/lib/use-require-auth";
 import { setPreferredTafsirId } from "@/lib/preferred-tafsir";
 
 export type TafsirSummary = {
@@ -70,6 +71,7 @@ export function TafsirReader({
   flash?: string;
 }) {
   const toast = useToast();
+  const requireAuth = useRequireAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -154,6 +156,7 @@ export function TafsirReader({
 
   async function createHighlight(color: string) {
     if (!activeSelection || !data) return;
+    if (!requireAuth()) return;
     const r = await fetch("/api/highlights", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -188,6 +191,7 @@ export function TafsirReader({
 
   function startNoteFromSelection() {
     if (!activeSelection || !data) return;
+    if (!requireAuth()) return;
     const text = data.text;
     const ctxStart = Math.max(0, activeSelection.start - 20);
     const ctxEnd = Math.min(text.length, activeSelection.end + 20);
@@ -279,6 +283,7 @@ export function TafsirReader({
   }
 
   async function toggleReadMark(tafsirId: number) {
+    if (!requireAuth()) return;
     const marked = readTafsirIds.has(tafsirId);
     const r = await fetch("/api/my/tafsir-reads", {
       method: marked ? "DELETE" : "POST",

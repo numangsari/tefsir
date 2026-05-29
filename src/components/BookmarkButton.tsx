@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useToast } from "@/components/Toaster";
+import { useRequireAuth } from "@/lib/use-require-auth";
 import {
   BOOKMARK_EVENT,
   emitBookmarkChange,
@@ -34,6 +35,7 @@ export function BookmarkButton({
   compact?: boolean;
 }) {
   const toast = useToast();
+  const requireAuth = useRequireAuth();
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [isHere, setIsHere] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -74,6 +76,7 @@ export function BookmarkButton({
     e.preventDefault();
     e.stopPropagation();
     if (loading) return;
+    if (!requireAuth()) return;
     setLoading(true);
     try {
       if (isHere) {

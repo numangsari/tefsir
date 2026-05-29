@@ -92,18 +92,14 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/oku/:path*",
-    "/sureler/:path*",
+    // Kişisel sayfalar — giriş zorunlu (okuma/arama/yazdırma misafire açık)
     "/panel/:path*",
     "/profil/:path*",
     "/yonetici/:path*",
-    "/yazdir/:path*",
-    "/arama/:path*",
     "/api/highlights/:path*",
     "/api/notes/:path*",
     "/api/my/:path*",
     "/api/admin/:path*",
-    "/api/search",
     "/api/kayit",
     "/api/auth/forgot-password",
     "/api/auth/reset-password",
