@@ -42,8 +42,8 @@ export function AuthUnified({ defaultTab = "giris" }: { defaultTab?: AuthTab }) 
 
   return (
     <main className="min-h-[100dvh] grid grid-cols-1 md:grid-cols-2">
-      <section className="bg-emerald-700 dark:bg-emerald-950 text-emerald-50 p-8 md:p-12 flex flex-col justify-center">
-        <div className="max-w-md mx-auto w-full">
+      <section className="bg-emerald-700 dark:bg-emerald-950 text-emerald-50 p-8 md:p-12 flex flex-col overflow-y-auto">
+        <div className="max-w-md mx-auto w-full my-auto">
           {ayah ? (
             <>
               <div className="arabic text-white mb-3 leading-[3rem]">{ayah.arabic}</div>
