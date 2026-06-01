@@ -26,7 +26,6 @@ export type TafsirSummary = {
 type TafsirData = {
   tafsir: { id: number; code: string; name: string };
   text: string;
-  originalText: string | null;
   modernizedAt: string | null;
   modernizedBy: string | null;
   highlights: Highlight[];
@@ -78,7 +77,6 @@ export function TafsirReader({
   const [data, setData] = useState<TafsirData | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showOriginal, setShowOriginal] = useState(false);
   const [hiddenNoteIds, setHiddenNoteIds] = useState<Set<string>>(new Set());
 
   // Aktif text seçimi (sağ paneldeki araçlar bunu kullanır)
@@ -424,18 +422,10 @@ export function TafsirReader({
         {!loading && data && !showNotes && (
           <>
             {data.modernizedAt && (
-              <div className="flex items-center justify-between gap-2 mb-3 px-3 py-2 rounded bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs">
+              <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs">
                 <div className="text-emerald-800 dark:text-emerald-200">
-                  {showOriginal
-                    ? "Orijinal (eski Türkçe) metin gösteriliyor."
-                    : "Metin günümüz Türkçesine sadeleştirildi."}
+                  Metin günümüz Türkçesine sadeleştirildi.
                 </div>
-                <button
-                  onClick={() => setShowOriginal((v) => !v)}
-                  className="px-2 py-1 rounded border border-emerald-600 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/60"
-                >
-                  {showOriginal ? "Sadeleştirilmişe dön" : "Orijinali göster"}
-                </button>
               </div>
             )}
             <TafsirContentView
@@ -443,11 +433,9 @@ export function TafsirReader({
               ayahNo={ayahNo}
               tafsirId={data.tafsir.id}
               tafsirName={data.tafsir.name}
-              text={showOriginal && data.originalText ? data.originalText : data.text}
-              highlights={
-                showOriginal && data.originalText ? [] : data.highlights /* offsets güncel metne göre */
-              }
-              notes={showOriginal && data.originalText ? [] : data.notes}
+              text={data.text}
+              highlights={data.highlights}
+              notes={data.notes}
               onSelectionChange={setActiveSelection}
               onHighlightClick={deleteHighlight}
               onNoteClick={(n) => setEditingNote(n)}

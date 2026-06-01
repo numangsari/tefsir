@@ -49,7 +49,6 @@ export async function GET(
       name: content.tafsir.name,
     },
     text: content.text,
-    originalText: content.originalText || null,
     modernizedAt: content.modernizedAt?.toISOString() ?? null,
     modernizedBy: content.modernizedBy ?? null,
     highlights,

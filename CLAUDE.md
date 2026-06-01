@@ -65,4 +65,4 @@ npx prisma studio    # DB görsel arayüzü
 - [ ] Yeni özellik veya hata bildirimi gelirse buraya ekle
 
 ## Son Güncelleme
-2026-06-01 — Tam denetim + 8 düzeltme: arama `mode:"insensitive"`, ESLint kuruldu, şifre min 8, rate limiter sağlamlaştırma, kullanılmayan html alanları temizlendi (tsc/lint/build temiz)
+2026-06-01 — Orijinal tefsir metni ifşası kaldırıldı ("Orijinali göster" butonu + API `originalText` çıkarıldı; yayında yalnızca sadeleştirilmiş metin). Öncesinde: tam denetim + 8 düzeltme (arama `mode:"insensitive"`, ESLint, şifre min 8, rate limiter, kullanılmayan html alanları). tsc/lint/build temiz

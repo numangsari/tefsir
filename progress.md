@@ -7,6 +7,17 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-01 — Orijinal tefsir metni ifşası kaldırıldı (güvenlik/içerik)
+
+Denetimde tespit edildi: modernleştirilmemiş tefsirler yayında tamamen gizli (tüm giriş noktalarında `modernizedAt` kapısı var), **ancak** modernleştirilmiş tefsirlerde "Orijinali göster" butonu sadeleştirme öncesi orijinal (eski Türkçe) metni son kullanıcıya sunuyordu. Gereksinim: yayında orijinallerin hiçbiri bulunmamalı.
+
+- `api/tafsir/.../route.ts`: yanıttan `originalText` çıkarıldı
+- `TafsirReader.tsx`: "Orijinali göster" butonu, `showOriginal` state'i ve `originalText` tip alanı kaldırıldı; içerik daima sadeleştirilmiş `text` gösteriyor
+- `originalText` DB sütunu ham yedek olarak korundu (yalnızca artık sunulmuyor)
+- tsc/lint/build temiz
+
+---
+
 ### 2026-06-01 — Tam denetim sonrası 8 düzeltme
 
 Baştan sona denetim yapıldı; tespit edilen sorunlardan 8 tanesi düzeltildi (tsc temiz, lint temiz, build başarılı):
