@@ -21,7 +21,10 @@ export async function GET(
     where: { tafsirId_ayahId: { tafsirId: tId, ayahId: ayet.id } },
     include: { tafsir: true },
   });
-  if (!content) return NextResponse.json({ error: "Tefsir bulunamadı" }, { status: 404 });
+  // Sadece AI ile sadeleştirilmiş tefsirler sitede gösterilir; ham metin DB'de
+  // dursa da burada yokmuş gibi 404 döner.
+  if (!content || !content.modernizedAt)
+    return NextResponse.json({ error: "Tefsir bulunamadı" }, { status: 404 });
 
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id;

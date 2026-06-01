@@ -143,6 +143,8 @@ export async function GET(req: NextRequest) {
     const tafsirRows = await prisma.tafsirContent.findMany({
       where: {
         text: { contains: q },
+        // Yalnızca AI ile sadeleştirilmiş tefsirler aramada görünür
+        modernizedAt: { not: null },
         ...(ayahWhere ? { ayah: ayahWhere } : {}),
       },
       take: MAX_PER_SECTION,

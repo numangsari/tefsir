@@ -39,7 +39,15 @@ export default async function AyahPage({
     orderBy: { id: "asc" },
     select: { id: true, nameTr: true, ayetCount: true },
   });
+  // Sol panelde yalnızca bu ayet için AI ile sadeleştirilmiş (modernizedAt dolu)
+  // içeriği olan tefsirler listelenir. Henüz sadeleştirilmemiş tefsirler veritabanında
+  // durur ama sitede görünmez.
   const allTafsirs = await prisma.tafsir.findMany({
+    where: {
+      contents: {
+        some: { ayahId: ayet.id, modernizedAt: { not: null } },
+      },
+    },
     orderBy: { order: "asc" },
     select: {
       id: true,

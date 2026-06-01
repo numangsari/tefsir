@@ -27,7 +27,8 @@ export default async function PrintPage({
     where: { tafsirId_ayahId: { tafsirId: tId, ayahId: ayet.id } },
     include: { tafsir: true },
   });
-  if (!content) notFound();
+  // Sadece AI ile sadeleştirilmiş tefsirler yazdırılabilir/görüntülenebilir
+  if (!content || !content.modernizedAt) notFound();
 
   const [highlights, notes] = userId
     ? await Promise.all([

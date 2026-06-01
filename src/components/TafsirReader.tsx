@@ -314,8 +314,8 @@ export function TafsirReader({
   if (tafsirs.length === 0) {
     return (
       <div className="mt-8 p-6 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded text-amber-900 dark:text-amber-200">
-        Bu ayet için henüz tefsir verisi indirilmemiş. Arka planda indirme devam ediyor olabilir,
-        biraz sonra tekrar deneyin.
+        Bu ayetin tefsirleri henüz günümüz Türkçesine sadeleştirilmedi. Sadeleştirme tamamlandıkça
+        burada görünecekler.
       </div>
     );
   }

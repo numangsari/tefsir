@@ -19,9 +19,11 @@ export async function GET(
   });
   if (!ayet) return NextResponse.json({ error: "Ayet bulunamadı" }, { status: 404 });
 
-  // Bu ayet için tüm tefsir özetleri (uzunluk dahil)
+  // Bu ayet için tefsir özetleri (uzunluk dahil)
+  // Sadece AI ile sadeleştirilmiş (modernizedAt dolu) tefsirler sitede gösterilir;
+  // henüz sadeleştirilmemiş ham metinler veritabanında durur ama listelenmez.
   const contents = await prisma.tafsirContent.findMany({
-    where: { ayahId: ayet.id },
+    where: { ayahId: ayet.id, modernizedAt: { not: null } },
     include: { tafsir: true },
     orderBy: { tafsir: { order: "asc" } },
   });
