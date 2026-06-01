@@ -36,7 +36,7 @@ export function BookmarkButton({
 }) {
   const toast = useToast();
   const requireAuth = useRequireAuth();
-  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [, setSavedAt] = useState<string | null>(null);
   const [isHere, setIsHere] = useState(false);
   const [loading, setLoading] = useState(false);
 

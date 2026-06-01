@@ -192,8 +192,8 @@ function RegisterForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (password.length < 6) {
-      setError("Şifre en az 6 karakter olmalı.");
+    if (password.length < 8) {
+      setError("Şifre en az 8 karakter olmalı.");
       return;
     }
     if (password !== password2) {
@@ -252,11 +252,11 @@ function RegisterForm() {
         />
       </div>
       <div>
-        <label className="block text-sm mb-1">Şifre (en az 6 karakter)</label>
+        <label className="block text-sm mb-1">Şifre (en az 8 karakter)</label>
         <input
           type="password"
           required
-          minLength={6}
+          minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full border rounded-md px-3 py-2 bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700"
@@ -267,7 +267,7 @@ function RegisterForm() {
         <input
           type="password"
           required
-          minLength={6}
+          minLength={8}
           value={password2}
           onChange={(e) => setPassword2(e.target.value)}
           className={`w-full border rounded-md px-3 py-2 bg-white dark:bg-stone-900 ${

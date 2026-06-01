@@ -62,7 +62,7 @@ npx prisma studio    # DB görsel arayüzü
 - Prisma generate Vercel build'den önce koşmalı (`"build": "prisma generate && next build"`)
 
 ## Bir Sonraki Oturumda Önce Bunlara Bak
-- [ ] Unstaged değişiklikler mevcut: `api/ayah`, `api/search`, `api/tafsir`, `oku/page`, `yazdir/page`, `TafsirReader.tsx` — incele ve commit et
+- [ ] Yeni özellik veya hata bildirimi gelirse buraya ekle
 
 ## Son Güncelleme
-2026-06-01 — Neon PostgreSQL geçişi, misafir modu, güvenlik başlıkları, Next.js CVE fix
+2026-06-01 — Tam denetim + 8 düzeltme: arama `mode:"insensitive"`, ESLint kuruldu, şifre min 8, rate limiter sağlamlaştırma, kullanılmayan html alanları temizlendi (tsc/lint/build temiz)

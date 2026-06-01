@@ -85,8 +85,10 @@ model Tafsir {
 }
 
 // Bir tefsirin bir ayet hakkındaki metni
-// html/text: gösterilen (varsa sadeleştirilmiş) versiyon
-// originalHtml/originalText: ilk scrape edilen ham hali (yedek, kullanıcı geri dönebilir)
+// text: gösterilen (varsa sadeleştirilmiş) düz metin — UI ve yazdırma SADECE bunu render eder
+// originalText: ilk scrape edilen ham düz metin (kullanıcı "ham metni göster" ile geri dönebilir)
+// html/originalHtml: ham scrape sırasında saklanan HTML yedekleri — şu an hiçbir yerde
+//   sunulmuyor/render edilmiyor; yeniden işleme/yedek amacıyla DB'de tutuluyor
 // modernizedAt: AI ile sadeleştirildi mi, ne zaman
 // modernizedBy: hangi model ile (opsiyonel)
 model TafsirContent {

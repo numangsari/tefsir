@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
     types.has("surah") && !hasAyahFilter
       ? await prisma.surah.findMany({
           where: {
-            nameTr: { contains: q },
+            nameTr: { contains: q, mode: "insensitive" },
             ...(hasSurahFilter ? { id: filterSurahId } : {}),
           },
           take: 15,
@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
   if (types.has("meal")) {
     const ayahMeal = await prisma.ayah.findMany({
       where: {
-        meal: { contains: q },
+        meal: { contains: q, mode: "insensitive" },
         ...(ayahWhere ?? {}),
       },
       take: MAX_PER_SECTION,
@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
 
     const translations = await prisma.translation.findMany({
       where: {
-        text: { contains: q },
+        text: { contains: q, mode: "insensitive" },
         ...(ayahWhere
           ? { ayah: ayahWhere }
           : {}),
@@ -142,7 +142,7 @@ export async function GET(req: NextRequest) {
   if (types.has("tafsir")) {
     const tafsirRows = await prisma.tafsirContent.findMany({
       where: {
-        text: { contains: q },
+        text: { contains: q, mode: "insensitive" },
         // Yalnızca AI ile sadeleştirilmiş tefsirler aramada görünür
         modernizedAt: { not: null },
         ...(ayahWhere ? { ayah: ayahWhere } : {}),
@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
       const noteRows = await prisma.note.findMany({
         where: {
           userId,
-          body: { contains: q },
+          body: { contains: q, mode: "insensitive" },
           ...(ayahWhere ? { ayah: ayahWhere } : {}),
         },
         take: MAX_PER_SECTION,
@@ -198,7 +198,7 @@ export async function GET(req: NextRequest) {
       const hlRows = await prisma.highlight.findMany({
         where: {
           userId,
-          text: { contains: q },
+          text: { contains: q, mode: "insensitive" },
           ...(ayahWhere ? { ayah: ayahWhere } : {}),
         },
         take: MAX_PER_SECTION,

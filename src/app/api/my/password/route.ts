@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
   if (!currentPassword || !newPassword) {
     return NextResponse.json({ error: "Mevcut ve yeni şifre zorunlu." }, { status: 400 });
   }
-  if (newPassword.length < 6) {
-    return NextResponse.json({ error: "Yeni şifre en az 6 karakter olmalı." }, { status: 400 });
+  if (newPassword.length < 8) {
+    return NextResponse.json({ error: "Yeni şifre en az 8 karakter olmalı." }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({ where: { id: userId } });

@@ -4,9 +4,6 @@ import { rateLimit } from "@/lib/rate-limit";
 
 const AUTH_ROUTES = new Set(["/api/kayit", "/api/auth/forgot-password", "/api/auth/reset-password"]);
 
-// Token gerektirmeyen public sayfalar
-const PUBLIC_PAGES = new Set(["/", "/giris", "/kayit", "/sifremi-unuttum", "/emaili-dogrula"]);
-
 function getIp(req: NextRequest) {
   return (
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??

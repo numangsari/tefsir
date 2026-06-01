@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   TafsirContentView,
   type Highlight,
@@ -26,9 +26,7 @@ export type TafsirSummary = {
 type TafsirData = {
   tafsir: { id: number; code: string; name: string };
   text: string;
-  html: string;
   originalText: string | null;
-  originalHtml: string | null;
   modernizedAt: string | null;
   modernizedBy: string | null;
   highlights: Highlight[];

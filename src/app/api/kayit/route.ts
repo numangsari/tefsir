@@ -15,11 +15,17 @@ export async function POST(req: NextRequest) {
   if (!email || !password) {
     return NextResponse.json({ error: "E-posta ve şifre zorunlu." }, { status: 400 });
   }
-  if (password.length < 6) {
-    return NextResponse.json({ error: "Şifre en az 6 karakter olmalı." }, { status: 400 });
-  }
 
   const normalized = email.toLowerCase().trim();
+  // Basit e-posta format doğrulaması
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!EMAIL_RE.test(normalized)) {
+    return NextResponse.json({ error: "Geçerli bir e-posta adresi girin." }, { status: 400 });
+  }
+  if (password.length < 8) {
+    return NextResponse.json({ error: "Şifre en az 8 karakter olmalı." }, { status: 400 });
+  }
+
   const existing = await prisma.user.findUnique({ where: { email: normalized } });
   if (existing) {
     return NextResponse.json({ error: "Bu e-posta zaten kayıtlı." }, { status: 409 });

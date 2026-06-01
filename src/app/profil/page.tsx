@@ -175,9 +175,9 @@ export default function ProfilePage() {
             type="password"
             value={next}
             onChange={(e) => setNext(e.target.value)}
-            placeholder="Yeni şifre (en az 6)"
+            placeholder="Yeni şifre (en az 8)"
             required
-            minLength={6}
+            minLength={8}
             className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
           />
           <input
@@ -186,7 +186,7 @@ export default function ProfilePage() {
             onChange={(e) => setNext2(e.target.value)}
             placeholder="Yeni şifre (tekrar)"
             required
-            minLength={6}
+            minLength={8}
             className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
           />
           {pwErr && <p className="text-sm text-red-700 dark:text-red-400">{pwErr}</p>}

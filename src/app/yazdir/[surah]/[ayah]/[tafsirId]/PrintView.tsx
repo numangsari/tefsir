@@ -138,7 +138,7 @@ export function PrintView({
           <ol className="space-y-3 footnote list-decimal pl-6">
             {notes.map((n) => (
               <li key={n.id}>
-                <div className="italic text-stone-500">"…{n.anchorText}…"</div>
+                <div className="italic text-stone-500">&ldquo;…{n.anchorText}…&rdquo;</div>
                 <div className="whitespace-pre-wrap">{n.body}</div>
               </li>
             ))}
@@ -156,7 +156,7 @@ export function PrintView({
                   className="inline-block w-2.5 h-2.5 mr-2 align-middle rounded-sm"
                   style={{ backgroundColor: COLOR_MAP[h.color] ?? "#fde68a" }}
                 />
-                <span className="italic">"{h.text}"</span>
+                <span className="italic">&ldquo;{h.text}&rdquo;</span>
               </li>
             ))}
           </ul>

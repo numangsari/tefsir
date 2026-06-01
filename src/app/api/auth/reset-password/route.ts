@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
   if (!token || !password) {
     return NextResponse.json({ error: "Token ve yeni şifre zorunlu." }, { status: 400 });
   }
-  if (password.length < 6) {
-    return NextResponse.json({ error: "Şifre en az 6 karakter olmalı." }, { status: 400 });
+  if (password.length < 8) {
+    return NextResponse.json({ error: "Şifre en az 8 karakter olmalı." }, { status: 400 });
   }
 
   const record = await prisma.passwordReset.findUnique({ where: { token } });

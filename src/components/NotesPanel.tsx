@@ -14,7 +14,6 @@ type Item = {
 };
 
 export function NotesPanel({
-  surahId,
   ayahNo,
   ayahId,
   surahName,
