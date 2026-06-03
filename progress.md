@@ -7,6 +7,29 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-03 (2. oturum) — Bekleyen işler tamamlandı + teknik borç temizliği
+
+Önceki oturumdan commit'lenmemiş kalan iş bağlandı ve bekleyen denetim bulguları temizlendi:
+
+- **DB script tuzağı kalıcı çözüldü**: `scripts/load-env.ts` eklendi — `dotenv` `{ override: true }` ile yüklenip shell'den miras alınan eski `DATABASE_URL=file:./dev.db` değerini `.env`'deki Neon URL ile eziyor. `check-user.ts` ve `verify-user.ts` artık `import "./load-env"` kullanıyor; bu scriptler **`env -u …` olmadan** doğrudan `npx tsx scripts/...` ile çalışıyor (test edildi: tuzaklı env'le bile Neon'a bağlandı). Not: export profil dosyalarında değil, Claude Code'u başlatan parent süreçten geliyor — bu yüzden çözüm script tarafında yapıldı.
+- **Kozmetik / teknik borç**:
+  - `package.json` adı `tefsir-projesi` → `tefsirnet`
+  - `.claude/` (yerel hafıza/ayar dizini) `.gitignore`'a eklendi
+  - Eski modernize logları silindi (`modernize-bakara.log` ~2MB, `modernize-bakara-ollama.log`)
+- **574 MB `prisma/dev.db` korunuyor**: Neon ile birebir karşılaştırıldı (TafsirContent 68.552/68.552, `originalText` 68.552/68.552 dolu, `modernizedAt` 612/612) — Neon eksiksiz kaynak, dev.db onun eski kopyası. Kullanıcı kararıyla çevrimdışı acil yedek olarak diskte tutuluyor (gitignored, silinmedi).
+
+---
+
+### 2026-06-03 — Kullanıcı giriş sorunu çözüldü (Merve Budak) + admin script'leri
+
+Kullanıcı "Merve Budak" giriş yapamıyordu. Veritabanı incelemesinde hesabın mevcut ancak `emailVerified: false` olduğu görüldü; `src/lib/auth.ts` doğrulanmamış e-postada girişi `EMAIL_NOT_VERIFIED` ile reddediyor (doğrulama e-postası ulaşmamış/spam'a düşmüş olabilir). Kullanıcı onayıyla `emailVerified` manuel olarak `true` yapıldı.
+
+- `scripts/check-user.ts` eklendi — ada/e-postaya göre kullanıcı arar ve durum (emailVerified, role…) gösterir
+- `scripts/verify-user.ts` eklendi — verilen e-postayı manuel doğrulanmış işaretler (`set-admin.ts` deseninde)
+- **Dikkat**: Shell'de eski SQLite'tan kalma `DATABASE_URL=file:./dev.db` export'u var; bu scriptler `env -u DATABASE_URL -u DIRECT_URL npx tsx ...` ile çalıştırılmalı (dotenv mevcut env'i ezmiyor). Kalıcı çözüm: `~/.zshrc`'den o export'u kaldırmak
+
+---
+
 ### 2026-06-01 — Orijinal tefsir metni ifşası kaldırıldı (güvenlik/içerik)
 
 Denetimde tespit edildi: modernleştirilmemiş tefsirler yayında tamamen gizli (tüm giriş noktalarında `modernizedAt` kapısı var), **ancak** modernleştirilmiş tefsirlerde "Orijinali göster" butonu sadeleştirme öncesi orijinal (eski Türkçe) metni son kullanıcıya sunuyordu. Gereksinim: yayında orijinallerin hiçbiri bulunmamalı.

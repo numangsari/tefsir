@@ -31,6 +31,8 @@ Next.js App Router; API route'ları `src/app/api/` altında. Tefsir verisi Postg
 | `src/data/tafsirs.ts` | 11 tefsir kataloğu (T001–T011) |
 | `scripts/modernize-tafsirs.ts` | AI sadeleştirme (Gemini/Ollama) |
 | `scripts/migrate-to-neon.ts` | SQLite → Neon PostgreSQL taşıma scripti |
+| `scripts/check-user.ts` | Ada/e-postaya göre kullanıcı arar (emailVerified, role…) |
+| `scripts/verify-user.ts` | Verilen e-postayı manuel doğrulanmış işaretler |
 
 ## Ortam ve Kurulum
 ```bash
@@ -60,9 +62,11 @@ npx prisma studio    # DB görsel arayüzü
 - `modernize-tafsirs.ts` Ollama ile çalışırken çok kaynak tüketir; `--pauseMs` ve `--ollamaThreads` flag'leri ile kısıtla
 - Dev sunucu hata verirse: `rm -rf .next && npm run dev`
 - Prisma generate Vercel build'den önce koşmalı (`"build": "prisma generate && next build"`)
+- **Shell'de eski SQLite `DATABASE_URL=file:./dev.db` export'u miras alınabiliyor** (parent süreçten geliyor; profil dosyalarında değil) → **çözüldü**: DB script'leri `import "./load-env"` (override'lı dotenv) kullanıyor, `.env`'deki Neon URL shell değerini eziyor; artık `env -u …` gerekmeden `npx tsx scripts/*.ts` doğrudan çalışıyor. Yeni DB script'i yazarken ilk satır `import "./load-env";` olmalı
+- **Giriş yapılamıyor şikâyeti** → ilk bakılacak: kullanıcının `emailVerified` durumu. `scripts/check-user.ts <ad/email>` ile kontrol; `auth.ts` doğrulanmamışta `EMAIL_NOT_VERIFIED` fırlatıyor
 
 ## Bir Sonraki Oturumda Önce Bunlara Bak
 - [ ] Yeni özellik veya hata bildirimi gelirse buraya ekle
 
 ## Son Güncelleme
-2026-06-01 — Orijinal tefsir metni ifşası kaldırıldı ("Orijinali göster" butonu + API `originalText` çıkarıldı; yayında yalnızca sadeleştirilmiş metin). Öncesinde: tam denetim + 8 düzeltme (arama `mode:"insensitive"`, ESLint, şifre min 8, rate limiter, kullanılmayan html alanları). tsc/lint/build temiz
+2026-06-03 (2. oturum) — Bekleyenler tamamlandı + temizlik: (1) DB script tuzağı kalıcı çözüldü → `scripts/load-env.ts` (override'lı dotenv); `check-user.ts`/`verify-user.ts` ona bağlandı, `env -u …` artık gerekmiyor. (2) Kozmetik: `package.json` adı `tefsir-projesi`→`tefsirnet`; `.claude/` gitignore'a eklendi; eski modernize logları (2MB) silindi. Önceki oturum: Merve Budak giriş sorunu (`emailVerified` manuel `true`), `check-user.ts`+`verify-user.ts` eklendi. Öncesinde: orijinal tefsir metni ifşası kaldırıldı; tam denetim + 8 düzeltme. tsc/lint/build temiz

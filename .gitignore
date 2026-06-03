@@ -8,3 +8,5 @@ data/raw
 data/tafsir-export
 *.log
 .DS_Store
+.claude
+tsconfig.tsbuildinfo
