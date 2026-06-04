@@ -15,8 +15,9 @@ export async function GET() {
       email: true,
       name: true,
       role: true,
+      emailVerified: true,
       createdAt: true,
-      _count: { select: { highlights: true, notes: true } },
+      _count: { select: { highlights: true, notes: true, tafsirReadMarks: true } },
     },
   });
 
@@ -26,9 +27,11 @@ export async function GET() {
       email: u.email,
       name: u.name,
       role: u.role,
+      emailVerified: u.emailVerified,
       createdAt: u.createdAt.toISOString(),
       highlightCount: u._count.highlights,
       noteCount: u._count.notes,
+      readMarkCount: u._count.tafsirReadMarks,
     }))
   );
 }

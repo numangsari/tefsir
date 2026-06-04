@@ -7,6 +7,19 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-04 — Yönetici paneli profesyonelleştirildi (3 sekme, grafikler, içerik kapsamı)
+
+Tek sayfalık basit yönetici paneli (`/yonetici`) çok daha gelişmiş, profesyonel ve fonksiyonel bir 3 sekmeli yapıya dönüştürüldü. `page.tsx` artık ince bir sekme kabuğu; her sekme kendi verisini çeken ayrı client bileşeni. Grafikler için **bağımlılıksız SVG** tercih edildi (kullanıcı kararı; son kullanıcı bundle'ı etkilenmiyor, route-level chunk).
+
+- **① Genel Bakış**: 6 istatistik kartı (kullanıcı, doğrulanmış %, vurgu, not, okuma işareti, ayet) + gerçek sadeleştirme ilerleme bar'ı (612/68.552 = %0.9) + 3 büyüme trend grafiği (son 30 gün kümülatif SVG sparkline: kullanıcı/not/vurgu) + en aktif kullanıcılar
+- **② Kullanıcılar** (derinleştirildi): e-posta doğrulama rozeti + tek tıkla **manuel doğrula** (artık `verify-user.ts` scriptine gerek yok), rol/durum filtreleri, sıralama (yeni/eski/aktiflik), okuma işareti sütunu, client-side sayfalama (20'şer)
+- **③ İçerik & Modernizasyon** (yeni): toplam/sadeleştirilmiş özet + başlanan/tamamlanan sure sayısı, 11 tefsir bazında kapsam barları, 114 sure bazında ilerleme (arama + "yalnızca başlananlar" filtresi)
+- **API**: `stats` genişletildi (büyüme zaman serisi `$queryRawUnsafe` + date_trunc, doğrulanmış/modernize sayıları); `users` (emailVerified + readMarkCount); `users/[id]` PATCH artık emailVerified toggle destekliyor; **yeni `/api/admin/content`** (tefsir & sure bazında kapsam, raw SQL). Hepsi `ADMIN` korumalı.
+- **Yeni dosyalar**: `src/app/yonetici/{types.ts, ui.tsx, GenelBakisTab.tsx, KullanicilarTab.tsx, IcerikTab.tsx}`, `src/app/api/admin/content/route.ts`
+- **Doğrulama**: tsc temiz, lint temiz, build başarılı; raw SQL sorguları gerçek Neon DB'ye karşı test edildi (Fâtiha 77/77, Bakara 535 sadeleştirilmiş → toplam 612)
+
+---
+
 ### 2026-06-03 (2. oturum) — Bekleyen işler tamamlandı + teknik borç temizliği
 
 Önceki oturumdan commit'lenmemiş kalan iş bağlandı ve bekleyen denetim bulguları temizlendi:
