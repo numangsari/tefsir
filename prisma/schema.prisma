@@ -205,6 +205,23 @@ model Note {
   @@index([userId, tafsirId, ayahId])
 }
 
+// Çerezsiz site trafiği analitiği — misafirler dahil her sayfa ziyareti.
+// visitorKey: günlük tuz + IP + UA hash'i; ham IP saklanmaz, anahtar her gün değişir
+// (kalıcı takip yok → KVKK dostu). Tekil ziyaretçi = bir gün içindeki distinct visitorKey.
+model PageView {
+  id         Int      @id @default(autoincrement())
+  path       String   // ziyaret edilen yol, ör. "/oku/2/255"
+  referrer   String?  // yönlendiren host (varsa)
+  visitorKey String   // günlük çerezsiz ziyaretçi hash'i
+  country    String?  // Vercel geo header'ından ülke kodu
+  device     String?  // "mobile" | "desktop" (UA'dan kaba tespit)
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([visitorKey, createdAt])
+  @@index([path])
+}
+
 // Kullanıcının bir ayette bir tefsiri okudu işareti
 model TafsirReadMark {
   id        String   @id @default(cuid())

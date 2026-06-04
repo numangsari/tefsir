@@ -7,6 +7,22 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-04 (2. iş) — Site trafiği analitiği + Vercel Web Analytics
+
+Yönetici paneline ziyaretçi/sayfa görüntüleme analitiği eklendi. **Önemli bulgu**: Vercel Web Analytics verisi hiçbir planda API ile çekilemiyor (Hobby'de hiç; programatik erişim yalnızca Pro+ "Drains" ve o da analitik verisi vermiyor) — bu yüzden Vercel'i panele bağlamak yerine **kendi çerezsiz analitiğimiz** kuruldu.
+
+- **Vercel Web Analytics** (önceki adım): `@vercel/analytics` + root layout'a `<Analytics />`. Veriler Vercel dashboard'da; panele bağlanamıyor (API yok).
+- **Kendi analitik (panele bağlı)**:
+  - `prisma/schema.prisma` → yeni **`PageView`** modeli (path, referrer, visitorKey, country, device, createdAt). Neon'a `prisma db push` ile eklendi (additive).
+  - **Çerezsiz tekil ziyaretçi**: `visitorKey` = günlük tuz (`NEXTAUTH_SECRET` + tarih) + IP + UA → SHA256. Ham IP saklanmaz, anahtar her gün değişir → kalıcı takip yok, KVKK dostu. Tekil ziyaretçi = gün içi distinct visitorKey (7/30g sayıları üst sınır göstergesi).
+  - `src/app/api/track/route.ts` (public POST): bot/önizleme UA filtresi, yalnızca `/` ile başlayan yollar, country `x-vercel-ip-country`'den, referrer host'a indirgenir (kendi domain → null/iç gezinme). Hata sessizce yutulur.
+  - `src/components/AnalyticsTracker.tsx`: layout'ta route değişiminde `navigator.sendBeacon('/api/track')`; `/yonetici` sayılmaz (kendi trafiğimiz hariç).
+  - `src/app/api/admin/analytics/route.ts` (ADMIN): bugün/7g/30g pageview+tekil ziyaretçi (tek sorguda FILTER), 30 günlük günlük seri, en çok gezilen sayfalar, yönlendiren kaynaklar (raw SQL).
+  - **Yeni "Trafik" sekmesi** (`TrafikTab.tsx`): 6 kart + 30 günlük SVG sparkline (pageview & ziyaretçi) + top sayfalar + top referrers. Panel artık 4 sekme.
+- **Not**: `/api/track` middleware matcher'ında değil → public. Lokal build'de `prisma:error postgresql://` mesajı shell `file:./dev.db` tuzağından (üretimi etkilemez). tsc/lint/build temiz; build alt-işlemi typescript'e eriştiği için **`next build` sandbox kapalı** çalıştırıldı.
+
+---
+
 ### 2026-06-04 — Yönetici paneli profesyonelleştirildi (3 sekme, grafikler, içerik kapsamı)
 
 Tek sayfalık basit yönetici paneli (`/yonetici`) çok daha gelişmiş, profesyonel ve fonksiyonel bir 3 sekmeli yapıya dönüştürüldü. `page.tsx` artık ince bir sekme kabuğu; her sekme kendi verisini çeken ayrı client bileşeni. Grafikler için **bağımlılıksız SVG** tercih edildi (kullanıcı kararı; son kullanıcı bundle'ı etkilenmiyor, route-level chunk).

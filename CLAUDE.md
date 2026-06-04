@@ -25,10 +25,11 @@ Next.js App Router; API route'ları `src/app/api/` altında. Tefsir verisi Postg
 | `src/components/OkuReaderShell.tsx` | Sticky başlık + okuyucu birleşimi |
 | `src/components/AyahWordBridge.tsx` | Arapça–meal çift yönlü kelime vurgusu |
 | `src/components/AuthUnified.tsx` | Giriş/kayıt birleşik ekranı |
-| `src/app/yonetici/page.tsx` | Yönetici paneli — 3 sekmeli kabuk (Genel Bakış / Kullanıcılar / İçerik) |
+| `src/app/yonetici/page.tsx` | Yönetici paneli — 4 sekmeli kabuk (Genel Bakış / Trafik / Kullanıcılar / İçerik) |
 | `src/app/yonetici/{ui,types}.tsx/ts` | Panel ortak UI bileşenleri (Tabs, StatCard, ProgressBar, SparkArea — bağımlılıksız SVG) + paylaşılan tipler |
-| `src/app/yonetici/{GenelBakis,Kullanicilar,Icerik}Tab.tsx` | Panel sekmeleri; her biri kendi `/api/admin/*` verisini çeker |
-| `src/app/api/admin/{stats,users,content}/route.ts` | Panel API'leri (ADMIN korumalı); stats büyüme zaman serisi + content tefsir/sure kapsamı |
+| `src/app/yonetici/{GenelBakis,Trafik,Kullanicilar,Icerik}Tab.tsx` | Panel sekmeleri; her biri kendi `/api/admin/*` verisini çeker |
+| `src/app/api/admin/{stats,users,content,analytics}/route.ts` | Panel API'leri (ADMIN korumalı); analytics = site trafiği (PageView raw SQL) |
+| `src/app/api/track/route.ts` | Public ziyaret kaydı (çerezsiz visitorKey hash); `AnalyticsTracker.tsx` layout'tan sendBeacon ile çağırır |
 | `src/app/api/search/route.ts` | Tam metin arama (sure + meal + tefsir + not) |
 | `src/app/yazdir/[surah]/[ayah]/[tafsirId]/page.tsx` | Yazdırma sayfası |
 | `src/lib/preferred-tafsir.ts` | sessionStorage ile seçili tefsir kalıcılığı |
@@ -70,10 +71,11 @@ npx prisma studio    # DB görsel arayüzü
 - **Giriş yapılamıyor şikâyeti** → ilk bakılacak: kullanıcının `emailVerified` durumu. `scripts/check-user.ts <ad/email>` ile kontrol; `auth.ts` doğrulanmamışta `EMAIL_NOT_VERIFIED` fırlatıyor
 
 ## Bir Sonraki Oturumda Önce Bunlara Bak
-- [ ] Yönetici paneli değişiklikleri **henüz commit edilmedi** (2026-06-04 oturumu) — kullanıcı onayıyla commit'lenecek
-- [ ] İçerik sekmesinden doğrudan modernizasyon tetikleme / kullanıcı detay modalı / CSV dışa aktarma — olası sonraki adımlar (kullanıcıya öneri olarak sunuldu)
+- [ ] **Analitik canlı doğrulaması**: deploy sonrası `tefsir.net` ziyaret edilip yönetici → Trafik sekmesinde veri düşüyor mu kontrol et (ilk veriler birkaç dk içinde). Vercel Analytics dashboard'u ayrıca etkinleştirilmeli (Vercel proje → Analytics → Enable)
+- [ ] **`prisma db push` shell tuzağı**: db migration'ı her zaman `env -u DATABASE_URL -u DIRECT_URL npx prisma db push` ile çalıştır (shell'deki `file:./dev.db` yoksa Neon yerine SQLite'a gider). Ayrıca güvenlik sınıflandırıcısı production DB push'u engelleyebilir → kullanıcı onayı gerekir
+- [ ] Olası sonraki adımlar: içerik sekmesinden modernizasyon tetikleme / kullanıcı detay modalı / CSV dışa aktarma / analitik için bot filtresini güçlendirme
 - [ ] Yeni özellik veya hata bildirimi gelirse buraya ekle
 
 ## Son Güncelleme
-2026-06-04 — Yönetici paneli (`/yonetici`) profesyonelleştirildi: tek sayfa → 3 sekme (Genel Bakış / Kullanıcılar / İçerik & Modernizasyon). Grafikler **bağımlılıksız SVG sparkline** (kullanıcı kararı). Genel Bakış: 6 kart + sadeleştirme ilerleme bar'ı (612/68.552) + 3 büyüme trend grafiği. Kullanıcılar: doğrulama rozeti + tek tıkla manuel doğrula (verify-user.ts'e gerek kalmadı), filtre/sıralama/sayfalama, okuma sütunu. Yeni `/api/admin/content` (tefsir & sure kapsamı, raw SQL). stats büyüme zaman serisiyle, users/[id] PATCH emailVerified toggle ile genişletildi. tsc/lint/build temiz; raw sorgular Neon'a karşı test edildi. **Commit bekliyor.**
-Önceki oturum (2026-06-03, 2.): DB script tuzağı kalıcı çözüldü → `scripts/load-env.ts` (override'lı dotenv); kozmetik temizlik (`package.json` adı, `.claude/` gitignore, eski loglar).
+2026-06-04 (2. iş) — Site trafiği analitiği eklendi. Vercel Web Analytics verisi API ile çekilemiyor (hiçbir planda public endpoint yok) → **kendi çerezsiz analitiğimiz** kuruldu: `PageView` modeli (Neon'a db push edildi), public `/api/track` (visitorKey = günlük tuz+IP+UA hash, ham IP saklanmaz), layout'ta `AnalyticsTracker` (sendBeacon, `/yonetici` hariç), ADMIN `/api/admin/analytics`, yeni **Trafik sekmesi** (panel artık 4 sekme). Ayrıca `@vercel/analytics` + `<Analytics />` eklendi (Vercel dashboard'da görünür, panele bağlanamaz). tsc/lint/build temiz (`next build` sandbox kapalı çalışır).
+Önceki iş (2026-06-04, 1.): Yönetici paneli 3 sekmeye dönüştürüldü (Genel Bakış/Kullanıcılar/İçerik), bağımlılıksız SVG grafikler, content API. Commit'lendi (3392b38).

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 
 export const metadata: Metadata = {
   title: "Tefsir Projesi",
@@ -21,6 +23,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased">
         <Providers>{children}</Providers>
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
         <Analytics />
       </body>
     </html>

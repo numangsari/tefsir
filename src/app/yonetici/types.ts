@@ -42,6 +42,15 @@ export type Stats = {
   growth: GrowthPoint[];
 };
 
+// Site trafiği (kendi çerezsiz analitiğimiz)
+export type TrafficStats = {
+  pageViews: { today: number; week: number; month: number };
+  visitors: { today: number; week: number; month: number };
+  daily: { date: string; pageViews: number; visitors: number }[];
+  topPages: { path: string; count: number }[];
+  topReferrers: { referrer: string; count: number }[];
+};
+
 // İçerik & modernizasyon kapsama
 export type TafsirCoverage = {
   tafsirId: number;

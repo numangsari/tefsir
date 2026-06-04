@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import { GenelBakisTab } from "./GenelBakisTab";
+import { TrafikTab } from "./TrafikTab";
 import { KullanicilarTab } from "./KullanicilarTab";
 import { IcerikTab } from "./IcerikTab";
 import { Tabs, type TabDef } from "./ui";
 
-type TabKey = "genel" | "kullanicilar" | "icerik";
+type TabKey = "genel" | "trafik" | "kullanicilar" | "icerik";
 
 const TABS: TabDef<TabKey>[] = [
   { key: "genel", label: "Genel Bakış" },
+  { key: "trafik", label: "Trafik" },
   { key: "kullanicilar", label: "Kullanıcılar" },
   { key: "icerik", label: "İçerik & Modernizasyon" },
 ];
@@ -26,6 +28,7 @@ export default function YoneticiPage() {
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
 
       {tab === "genel" && <GenelBakisTab />}
+      {tab === "trafik" && <TrafikTab />}
       {tab === "kullanicilar" && <KullanicilarTab />}
       {tab === "icerik" && <IcerikTab />}
     </main>
