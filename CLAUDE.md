@@ -25,10 +25,11 @@ Next.js App Router; API route'ları `src/app/api/` altında. Tefsir verisi Postg
 | `src/components/OkuReaderShell.tsx` | Sticky başlık + okuyucu birleşimi |
 | `src/components/AyahWordBridge.tsx` | Arapça–meal çift yönlü kelime vurgusu |
 | `src/components/AuthUnified.tsx` | Giriş/kayıt birleşik ekranı |
-| `src/app/yonetici/page.tsx` | Yönetici paneli — 4 sekmeli kabuk (Genel Bakış / Trafik / Kullanıcılar / İçerik) |
+| `src/app/yonetici/page.tsx` | Yönetici paneli — 5 sekmeli kabuk (Genel Bakış / Trafik / Kullanıcılar / İçerik / Denetim) |
 | `src/app/yonetici/{ui,types}.tsx/ts` | Panel ortak UI bileşenleri (Tabs, StatCard, ProgressBar, SparkArea — bağımlılıksız SVG) + paylaşılan tipler |
-| `src/app/yonetici/{GenelBakis,Trafik,Kullanicilar,Icerik}Tab.tsx` | Panel sekmeleri; her biri kendi `/api/admin/*` verisini çeker |
-| `src/app/api/admin/{stats,users,content,analytics}/route.ts` | Panel API'leri (ADMIN korumalı); analytics = site trafiği (PageView raw SQL) |
+| `src/app/yonetici/{GenelBakis,Trafik,Kullanicilar,Icerik,Denetim}Tab.tsx` | Panel sekmeleri; her biri kendi `/api/admin/*` verisini çeker |
+| `src/app/api/admin/{stats,users,content,analytics,audit}/route.ts` | Panel API'leri (ADMIN korumalı); audit = denetim kaydı, analytics = trafik |
+| `src/lib/audit.ts` | `recordAudit()` — admin işlemlerini AuditLog'a yazar (hata olsa bile asıl işlemi bozmaz) |
 | `src/app/api/track/route.ts` | Public ziyaret kaydı (çerezsiz visitorKey hash); `AnalyticsTracker.tsx` layout'tan sendBeacon ile çağırır |
 | `src/app/api/search/route.ts` | Tam metin arama (sure + meal + tefsir + not) |
 | `src/app/yazdir/[surah]/[ayah]/[tafsirId]/page.tsx` | Yazdırma sayfası |
@@ -77,5 +78,6 @@ npx prisma studio    # DB görsel arayüzü
 - [ ] Yeni özellik veya hata bildirimi gelirse buraya ekle
 
 ## Son Güncelleme
-2026-06-04 (2. iş) — Site trafiği analitiği eklendi. Vercel Web Analytics verisi API ile çekilemiyor (hiçbir planda public endpoint yok) → **kendi çerezsiz analitiğimiz** kuruldu: `PageView` modeli (Neon'a db push edildi), public `/api/track` (visitorKey = günlük tuz+IP+UA hash, ham IP saklanmaz), layout'ta `AnalyticsTracker` (sendBeacon, `/yonetici` hariç), ADMIN `/api/admin/analytics`, yeni **Trafik sekmesi** (panel artık 4 sekme). Ayrıca `@vercel/analytics` + `<Analytics />` eklendi (Vercel dashboard'da görünür, panele bağlanamaz). tsc/lint/build temiz (`next build` sandbox kapalı çalışır).
+2026-06-04 (3. iş) — Soft delete + audit log. `User.deletedAt` + yeni `AuditLog` (Neon'a db push edildi). Kullanıcı silme artık geri alınabilir (soft); `?permanent=1` hard delete; `auth.ts` silinmiş hesabı reddediyor; `restore` ile geri yükleme. Tüm admin işlemleri `lib/audit.ts` → AuditLog'a yazılıyor; yeni "Denetim Kaydı" sekmesi (panel 5 sekme). tsc/lint/build temiz.
+Önceki iş (2026-06-04, 2.) — Site trafiği analitiği eklendi. Vercel Web Analytics verisi API ile çekilemiyor (hiçbir planda public endpoint yok) → **kendi çerezsiz analitiğimiz** kuruldu: `PageView` modeli (Neon'a db push edildi), public `/api/track` (visitorKey = günlük tuz+IP+UA hash, ham IP saklanmaz), layout'ta `AnalyticsTracker` (sendBeacon, `/yonetici` hariç), ADMIN `/api/admin/analytics`, yeni **Trafik sekmesi** (panel artık 4 sekme). Ayrıca `@vercel/analytics` + `<Analytics />` eklendi (Vercel dashboard'da görünür, panele bağlanamaz). tsc/lint/build temiz (`next build` sandbox kapalı çalışır).
 Önceki iş (2026-06-04, 1.): Yönetici paneli 3 sekmeye dönüştürüldü (Genel Bakış/Kullanıcılar/İçerik), bağımlılıksız SVG grafikler, content API. Commit'lendi (3392b38).

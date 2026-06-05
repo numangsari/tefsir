@@ -7,6 +7,19 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-04 (3. iş) — Soft delete + audit log (denetim kaydı)
+
+Yönetici paneline iki güvenlik özelliği eklendi: kullanıcı silme artık geri alınabilir (soft delete) ve tüm admin işlemleri denetim kaydına yazılıyor.
+
+- **Şema**: `User.deletedAt DateTime?` (null=aktif) + yeni `AuditLog` modeli (actorId/actorEmail snapshot — admin silinse bile iz kalır, FK yok; action, targetType/Id/Label, metadata Json). Neon'a `db push` ile eklendi (additive).
+- **Soft delete**: `DELETE /api/admin/users/[id]` artık veriyi yok etmiyor, `deletedAt` damgalıyor (not/vurgular korunur). `?permanent=1` → gerçek hard delete (KVKK silme talepleri için). `auth.ts`: `deletedAt` dolu kullanıcı giriş yapamıyor. `users` listesi varsayılan aktifler; `?includeDeleted=1` ile hepsi.
+- **Geri yükleme**: `PATCH { restore: true }` → `deletedAt = null`.
+- **Audit log**: `src/lib/audit.ts` `recordAudit()` (hata olsa bile asıl işlemi bozmaz). Rol değişimi, doğrulama, soft/hard delete, restore kaydediliyor. `GET /api/admin/audit` (ADMIN, son 100).
+- **UI**: Kullanıcılar sekmesine "Silinmişleri göster" filtresi + silinmiş satır (soluk, 🗑 rozeti) için Geri Yükle / Kalıcı Sil; aktifte Sil (soft). Yeni **"Denetim Kaydı" sekmesi** (`DenetimTab`) — okunabilir Türkçe etiketli işlem geçmişi. Panel artık **5 sekme**.
+- tsc/lint/build temiz; db push sonrası Neon'a karşı doğrulandı (deletedAt + AuditLog çalışıyor).
+
+---
+
 ### 2026-06-04 (2. iş) — Site trafiği analitiği + Vercel Web Analytics
 
 Yönetici paneline ziyaretçi/sayfa görüntüleme analitiği eklendi. **Önemli bulgu**: Vercel Web Analytics verisi hiçbir planda API ile çekilemiyor (Hobby'de hiç; programatik erişim yalnızca Pro+ "Drains" ve o da analitik verisi vermiyor) — bu yüzden Vercel'i panele bağlamak yerine **kendi çerezsiz analitiğimiz** kuruldu.

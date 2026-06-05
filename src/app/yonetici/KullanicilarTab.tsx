@@ -17,13 +17,15 @@ export function KullanicilarTab() {
   const [q, setQ] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
   const [verifyFilter, setVerifyFilter] = useState<VerifyFilter>("all");
+  const [showDeleted, setShowDeleted] = useState(false);
   const [sort, setSort] = useState<SortKey>("recent");
   const [page, setPage] = useState(0);
   const toast = useToast();
 
   const load = useCallback(async () => {
     setLoading(true);
-    const res = await fetch("/api/admin/users", { cache: "no-store" });
+    // Silinmişler de gelsin; gösterimi client tarafında filtreleriz
+    const res = await fetch("/api/admin/users?includeDeleted=1", { cache: "no-store" });
     if (res.ok) setUsers(await res.json());
     setLoading(false);
   }, []);
@@ -32,10 +34,9 @@ export function KullanicilarTab() {
     load();
   }, [load]);
 
-  // Filtre/sıralama değişince ilk sayfaya dön
   useEffect(() => {
     setPage(0);
-  }, [q, roleFilter, verifyFilter, sort]);
+  }, [q, roleFilter, verifyFilter, showDeleted, sort]);
 
   async function setRole(id: string, role: "USER" | "ADMIN") {
     const r = await fetch(`/api/admin/users/${id}`, {
@@ -51,7 +52,7 @@ export function KullanicilarTab() {
 
   async function verify(id: string, email: string) {
     const ok = await toast.confirm(
-      `'${email}' kullanıcısının e-postasını manuel olarak doğrulanmış işaretlensin mi?`
+      `'${email}' kullanıcısının e-postası manuel olarak doğrulanmış işaretlensin mi?`
     );
     if (!ok) return;
     const r = await fetch(`/api/admin/users/${id}`, {
@@ -65,15 +66,45 @@ export function KullanicilarTab() {
     } else toast.error("Doğrulanamadı.");
   }
 
-  async function remove(id: string, email: string) {
+  // Soft delete — veri korunur, geri yüklenebilir
+  async function softDelete(id: string, email: string) {
     const ok = await toast.confirm(
-      `'${email}' kullanıcısını ve tüm vurgu/notlarını silmek istiyor musun?`
+      `'${email}' kullanıcısı silinsin mi? (Veriler korunur, geri yüklenebilir.)`
     );
     if (!ok) return;
     const r = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
     if (r.ok) {
+      const now = new Date().toISOString();
+      setUsers((us) => us.map((u) => (u.id === id ? { ...u, deletedAt: now } : u)));
+      toast.success("Kullanıcı silindi (geri yüklenebilir).");
+    } else {
+      const j = (await r.json().catch(() => ({}))) as { error?: string };
+      toast.error(j.error || "Silinemedi.");
+    }
+  }
+
+  async function restore(id: string, email: string) {
+    const r = await fetch(`/api/admin/users/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ restore: true }),
+    });
+    if (r.ok) {
+      setUsers((us) => us.map((u) => (u.id === id ? { ...u, deletedAt: null } : u)));
+      toast.success(`'${email}' geri yüklendi.`);
+    } else toast.error("Geri yüklenemedi.");
+  }
+
+  // Kalıcı sil — geri alınamaz hard delete
+  async function hardDelete(id: string, email: string) {
+    const ok = await toast.confirm(
+      `'${email}' KALICI olarak silinsin mi? Bu işlem geri ALINAMAZ; tüm not/vurguları da silinir.`
+    );
+    if (!ok) return;
+    const r = await fetch(`/api/admin/users/${id}?permanent=1`, { method: "DELETE" });
+    if (r.ok) {
       setUsers((us) => us.filter((u) => u.id !== id));
-      toast.success("Kullanıcı silindi.");
+      toast.success("Kullanıcı kalıcı olarak silindi.");
     } else {
       const j = (await r.json().catch(() => ({}))) as { error?: string };
       toast.error(j.error || "Silinemedi.");
@@ -83,6 +114,7 @@ export function KullanicilarTab() {
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     const list = users.filter((u) => {
+      if (!showDeleted && u.deletedAt) return false;
       if (needle && !u.email.toLowerCase().includes(needle) && !(u.name ?? "").toLowerCase().includes(needle))
         return false;
       if (roleFilter !== "all" && u.role !== roleFilter) return false;
@@ -98,7 +130,9 @@ export function KullanicilarTab() {
       return sort === "oldest" ? ta - tb : tb - ta;
     });
     return list;
-  }, [users, q, roleFilter, verifyFilter, sort]);
+  }, [users, q, roleFilter, verifyFilter, showDeleted, sort]);
+
+  const deletedCount = useMemo(() => users.filter((u) => u.deletedAt).length, [users]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const current = page > pageCount - 1 ? pageCount - 1 : page;
@@ -106,7 +140,6 @@ export function KullanicilarTab() {
 
   return (
     <Card>
-      {/* Üst araç çubuğu */}
       <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
         <h2 className="text-sm font-medium text-stone-700 dark:text-stone-300">
           Kullanıcılar ({loading ? "..." : filtered.length})
@@ -119,14 +152,17 @@ export function KullanicilarTab() {
         />
       </div>
 
-      {/* Filtreler */}
-      <div className="flex flex-wrap gap-2 mb-3 text-xs">
+      <div className="flex flex-wrap items-center gap-2 mb-3 text-xs">
         <Select label="Rol" value={roleFilter} onChange={(v) => setRoleFilter(v as RoleFilter)}
           options={[["all", "Tüm roller"], ["USER", "USER"], ["ADMIN", "ADMIN"]]} />
         <Select label="Durum" value={verifyFilter} onChange={(v) => setVerifyFilter(v as VerifyFilter)}
           options={[["all", "Tüm durumlar"], ["verified", "Doğrulanmış"], ["pending", "Bekleyen"]]} />
         <Select label="Sırala" value={sort} onChange={(v) => setSort(v as SortKey)}
           options={[["recent", "En yeni"], ["oldest", "En eski"], ["activity", "Aktiflik"]]} />
+        <label className="inline-flex items-center gap-1.5 text-stone-500 dark:text-stone-400 ml-auto">
+          <input type="checkbox" checked={showDeleted} onChange={(e) => setShowDeleted(e.target.checked)} />
+          Silinmişleri göster{deletedCount > 0 ? ` (${deletedCount})` : ""}
+        </label>
       </div>
 
       <div className="overflow-x-auto">
@@ -145,58 +181,85 @@ export function KullanicilarTab() {
             </tr>
           </thead>
           <tbody>
-            {pageRows.map((u) => (
-              <tr
-                key={u.id}
-                className="border-b border-stone-100 dark:border-stone-800 last:border-b-0"
-              >
-                <td className="py-2 pr-2">{u.email}</td>
-                <td className="py-2 pr-2">{u.name || "—"}</td>
-                <td className="py-2 pr-2">
-                  <select
-                    value={u.role}
-                    onChange={(e) => setRole(u.id, e.target.value as "USER" | "ADMIN")}
-                    className={`text-xs px-2 py-1 rounded border ${
-                      u.role === "ADMIN"
-                        ? "border-amber-500 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30"
-                        : "border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800"
-                    }`}
-                  >
-                    <option value="USER">USER</option>
-                    <option value="ADMIN">ADMIN</option>
-                  </select>
-                </td>
-                <td className="py-2 pr-2">
-                  {u.emailVerified ? (
-                    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      ✓ Doğrulanmış
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => verify(u.id, u.email)}
-                      title="Manuel doğrula"
-                      className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/40"
+            {pageRows.map((u) => {
+              const isDeleted = !!u.deletedAt;
+              return (
+                <tr
+                  key={u.id}
+                  className={`border-b border-stone-100 dark:border-stone-800 last:border-b-0 ${
+                    isDeleted ? "opacity-50" : ""
+                  }`}
+                >
+                  <td className="py-2 pr-2">{u.email}</td>
+                  <td className="py-2 pr-2">{u.name || "—"}</td>
+                  <td className="py-2 pr-2">
+                    <select
+                      value={u.role}
+                      disabled={isDeleted}
+                      onChange={(e) => setRole(u.id, e.target.value as "USER" | "ADMIN")}
+                      className={`text-xs px-2 py-1 rounded border disabled:cursor-not-allowed ${
+                        u.role === "ADMIN"
+                          ? "border-amber-500 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30"
+                          : "border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800"
+                      }`}
                     >
-                      ⚠ Bekliyor · doğrula
-                    </button>
-                  )}
-                </td>
-                <td className="py-2 pr-2 text-right">{u.highlightCount}</td>
-                <td className="py-2 pr-2 text-right">{u.noteCount}</td>
-                <td className="py-2 pr-2 text-right">{u.readMarkCount}</td>
-                <td className="py-2 pr-2 text-xs text-stone-500 dark:text-stone-400">
-                  {new Date(u.createdAt).toLocaleDateString("tr-TR")}
-                </td>
-                <td className="py-2 text-right">
-                  <button
-                    onClick={() => remove(u.id, u.email)}
-                    className="text-xs text-red-700 dark:text-red-400 hover:underline"
-                  >
-                    Sil
-                  </button>
-                </td>
-              </tr>
-            ))}
+                      <option value="USER">USER</option>
+                      <option value="ADMIN">ADMIN</option>
+                    </select>
+                  </td>
+                  <td className="py-2 pr-2">
+                    {isDeleted ? (
+                      <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">
+                        🗑 Silinmiş
+                      </span>
+                    ) : u.emailVerified ? (
+                      <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        ✓ Doğrulanmış
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => verify(u.id, u.email)}
+                        title="Manuel doğrula"
+                        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/40"
+                      >
+                        ⚠ Bekliyor · doğrula
+                      </button>
+                    )}
+                  </td>
+                  <td className="py-2 pr-2 text-right">{u.highlightCount}</td>
+                  <td className="py-2 pr-2 text-right">{u.noteCount}</td>
+                  <td className="py-2 pr-2 text-right">{u.readMarkCount}</td>
+                  <td className="py-2 pr-2 text-xs text-stone-500 dark:text-stone-400">
+                    {new Date(u.createdAt).toLocaleDateString("tr-TR")}
+                  </td>
+                  <td className="py-2 text-right whitespace-nowrap">
+                    {isDeleted ? (
+                      <span className="inline-flex gap-2">
+                        <button
+                          onClick={() => restore(u.id, u.email)}
+                          className="text-xs text-emerald-700 dark:text-emerald-400 hover:underline"
+                        >
+                          Geri yükle
+                        </button>
+                        <button
+                          onClick={() => hardDelete(u.id, u.email)}
+                          className="text-xs text-red-700 dark:text-red-400 hover:underline"
+                        >
+                          Kalıcı sil
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => softDelete(u.id, u.email)}
+                        className="text-xs text-red-700 dark:text-red-400 hover:underline"
+                      >
+                        Sil
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
             {!loading && filtered.length === 0 && (
               <tr>
                 <td colSpan={9} className="py-4 text-center text-stone-500 dark:text-stone-400">
@@ -208,7 +271,6 @@ export function KullanicilarTab() {
         </table>
       </div>
 
-      {/* Sayfalama */}
       {filtered.length > PAGE_SIZE && (
         <div className="flex items-center justify-between mt-3 text-xs text-stone-500 dark:text-stone-400">
           <span>

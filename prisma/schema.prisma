@@ -124,6 +124,7 @@ model User {
   role          String   @default("USER") // USER veya ADMIN
   emailVerified Boolean  @default(false)
   createdAt     DateTime @default(now())
+  deletedAt     DateTime? // soft delete: null = aktif; dolu = silinmiş (giriş yapamaz, listede gizli)
 
   // "burada kaldım"
   bookmarkSurahId  Int?
@@ -203,6 +204,23 @@ model Note {
 
   @@index([userId, ayahId])
   @@index([userId, tafsirId, ayahId])
+}
+
+// Yönetici işlem denetim kaydı. Actor'a (admin) FK YOK: admin silinse bile iz kalmalı,
+// bu yüzden actorId + actorEmail snapshot olarak tutulur. Hedef de targetLabel ile snapshot'lanır.
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorId     String?  // işlemi yapan admin id'si (snapshot, FK değil)
+  actorEmail  String   // işlemi yapan admin e-postası (okunabilirlik için snapshot)
+  action      String   // "user.role_change" | "user.verify" | "user.soft_delete" | "user.restore" | "user.hard_delete"
+  targetType  String   // "user"
+  targetId    String   // hedef kaydın id'si
+  targetLabel String?  // hedef snapshot (ör. e-posta) — hedef silinse bile okunabilsin
+  metadata    Json?    // işleme özel detay, ör. { from: "USER", to: "ADMIN" }
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([targetType, targetId])
 }
 
 // Çerezsiz site trafiği analitiği — misafirler dahil her sayfa ziyareti.

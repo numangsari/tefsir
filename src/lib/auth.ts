@@ -27,6 +27,8 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email.toLowerCase() },
         });
         if (!user) return null;
+        // Soft-delete edilmiş hesap giriş yapamaz (mevcut değilmiş gibi davran)
+        if (user.deletedAt) return null;
         const ok = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!ok) return null;
         if (!user.emailVerified) {

@@ -7,9 +7,21 @@ export type User = {
   role: "USER" | "ADMIN";
   emailVerified: boolean;
   createdAt: string;
+  deletedAt: string | null;
   highlightCount: number;
   noteCount: number;
   readMarkCount: number;
+};
+
+export type AuditEntry = {
+  id: string;
+  actorEmail: string;
+  action: string;
+  targetType: string;
+  targetId: string;
+  targetLabel: string | null;
+  metadata: unknown;
+  createdAt: string;
 };
 
 export type TopUser = {
