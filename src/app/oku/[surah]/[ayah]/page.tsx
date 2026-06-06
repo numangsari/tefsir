@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { OkuReaderShell } from "@/components/OkuReaderShell";
+import { JsonLd } from "@/components/JsonLd";
 
 type RouteParams = { surah: string; ayah: string };
 
@@ -106,8 +107,38 @@ export default async function AyahPage({
     },
   });
 
+  const canonical = `https://tefsir.net/oku/${sId}/${aNo}`;
+  const ayahJsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: `${surahMeta.nameTr} Sûresi ${aNo}. ayet`,
+      inLanguage: "tr",
+      mainEntityOfPage: canonical,
+      url: canonical,
+      about: "Kur'an-ı Kerim tefsiri",
+      isPartOf: { "@type": "WebSite", name: "tefsir.net", url: "https://tefsir.net" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "tefsir.net", item: "https://tefsir.net" },
+        { "@type": "ListItem", position: 2, name: "Sûreler", item: "https://tefsir.net/sureler" },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: `${surahMeta.nameTr} Sûresi`,
+          item: `https://tefsir.net/oku/${sId}/1`,
+        },
+        { "@type": "ListItem", position: 4, name: `${aNo}. ayet`, item: canonical },
+      ],
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-[1400px] px-4 pb-6">
+      <JsonLd data={ayahJsonLd} />
       <Suspense fallback={<div className="py-8 text-stone-500">Yükleniyor…</div>}>
         <OkuReaderShell
           surahMeta={surahMeta}

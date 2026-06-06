@@ -7,6 +7,19 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-06 (4. iş) — SEO II: OG görselleri, JSON-LD, Search Console
+
+Görünürlük çalışmasının ikinci dalgası:
+
+- **OG (paylaşım) görselleri**: `next/og` ile dinamik 1200×630 PNG. Kök `opengraph-image.tsx` (marka kartı) + ayet bazlı `oku/[surah]/[ayah]/opengraph-image.tsx` ("Bakara Sûresi 6. ayet" + meal alıntısı). Türkçe karakterler için PT Serif TTF gömüldü (`src/app/_og/`); Node `fetch` `file:`'i desteklemediğinden font `readFileSync(fileURLToPath(new URL(...)))` ile okunuyor (build + Vercel file-tracing uyumlu). Yerelde render doğrulandı.
+- **JSON-LD yapısal veri**: `JsonLd` bileşeni. Layout'ta WebSite + Organization; okuyucu sayfasında Article + BreadcrumbList (sûre/ayet kırılımı). Zengin sonuç/kırıntı için.
+- **Google Search Console**: `layout.tsx` metadata'sına `verification.google` (env: `GOOGLE_SITE_VERIFICATION`); `.env.example`'a eklendi. Kullanıcı GSC'den HTML-etiketi kodunu alıp Vercel env'e koyacak, sonra sitemap'i gönderecek.
+- tsc/lint/build temiz; kök OG statik (○), ayet OG dinamik (ƒ) üretildi.
+
+**Sonraki olası SEO adımları**: Search Console doğrulama + sitemap gönderimi (kullanıcı), sitelinks arama kutusu için `/arama?q=` deep-link desteği, sayfa içi iç bağlantı zenginleştirme.
+
+---
+
 ### 2026-06-06 (3. iş) — Logo, marka kimliği ve SEO başlangıcı + Sıradaki konumu
 
 İlk "internette görünür olma" adımları ve okuyucu yerleşim düzeltmesi:

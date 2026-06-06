@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
+import { JsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tefsir.net"),
@@ -47,7 +48,29 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
+  // Google Search Console doğrulama kodu (Vercel'de GOOGLE_SITE_VERIFICATION env'i)
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
+
+const siteJsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "tefsir.net",
+    alternateName: "Tefsir.net Kur'an-ı Kerim tefsir okuyucu",
+    url: "https://tefsir.net",
+    inLanguage: "tr",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "tefsir.net",
+    url: "https://tefsir.net",
+    logo: "https://tefsir.net/icon.svg",
+  },
+];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -61,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="antialiased">
+        <JsonLd data={siteJsonLd} />
         <Providers>{children}</Providers>
         <Suspense fallback={null}>
           <AnalyticsTracker />
