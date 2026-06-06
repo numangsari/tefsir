@@ -4,7 +4,16 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { OkuReaderShell } from "@/components/OkuReaderShell";
+import type { TafsirData } from "@/components/TafsirReader";
 import { JsonLd } from "@/components/JsonLd";
+import { cleanTafsirText } from "@/lib/clean-tafsir-text";
+import {
+  getAllSurahs,
+  getAyah,
+  getAyahTafsirs,
+  getModernizedTafsirRaw,
+  getSurah,
+} from "@/lib/reader-data";
 
 type RouteParams = { surah: string; ayah: string };
 
@@ -18,22 +27,18 @@ export async function generateMetadata({
   const aNo = parseInt(ayah);
   if (Number.isNaN(sId) || Number.isNaN(aNo)) return {};
 
-  const s = await prisma.surah.findUnique({
-    where: { id: sId },
-    select: { nameTr: true },
-  });
+  // Sûre + ayet + ince-sayfa kontrolü paralel (sûre/ayet sorguları React cache ile
+  // sayfa gövdesiyle paylaşılır → tekrar round-trip yok).
+  const [s, ayet, contentCount] = await Promise.all([
+    getSurah(sId),
+    getAyah(sId, aNo),
+    // Sadeleştirilmiş tefsir içeriği olmayan ayet sayfaları "ince"dir → noindex
+    // (Google indekslemesin ama linkleri takip etsin: follow). İçerik eklenince indekslenir.
+    prisma.tafsirContent.count({
+      where: { ayah: { surahId: sId, number: aNo }, modernizedAt: { not: null } },
+    }),
+  ]);
   if (!s) return {};
-
-  const ayet = await prisma.ayah.findUnique({
-    where: { surahId_number: { surahId: sId, number: aNo } },
-    select: { meal: true },
-  });
-
-  // Sadeleştirilmiş tefsir içeriği olmayan ayet sayfaları "ince"dir → noindex
-  // (Google indekslemesin ama linkleri takip etsin: follow). İçerik eklenince indekslenir.
-  const contentCount = await prisma.tafsirContent.count({
-    where: { ayah: { surahId: sId, number: aNo }, modernizedAt: { not: null } },
-  });
 
   const title = `${s.nameTr} Sûresi ${aNo}. ayet`;
   const meal = ayet?.meal?.replace(/\s+/g, " ").trim();
@@ -79,41 +84,48 @@ export default async function AyahPage({
   const aNo = parseInt(ayah);
   if (Number.isNaN(sId) || Number.isNaN(aNo)) notFound();
 
-  const surahMeta = await prisma.surah.findUnique({ where: { id: sId } });
+  // Birbirinden bağımsız üç sorgu paralel. surah/ayah React cache ile generateMetadata
+  // ile paylaşılır; allSurahs istekler arası önbellekten gelir.
+  const [surahMeta, ayet, allSurahs] = await Promise.all([
+    getSurah(sId),
+    getAyah(sId, aNo),
+    getAllSurahs(),
+  ]);
   if (!surahMeta) notFound();
   if (aNo < 1 || aNo > surahMeta.ayetCount) {
     redirect(`/oku/${sId}/1`);
   }
-
-  const ayet = await prisma.ayah.findUnique({
-    where: { surahId_number: { surahId: sId, number: aNo } },
-  });
   if (!ayet) notFound();
 
-  const allSurahs = await prisma.surah.findMany({
-    orderBy: { id: "asc" },
-    select: { id: true, nameTr: true, ayetCount: true },
-  });
   // Sol panelde yalnızca bu ayet için AI ile sadeleştirilmiş (modernizedAt dolu)
   // içeriği olan tefsirler listelenir. Henüz sadeleştirilmemiş tefsirler veritabanında
   // durur ama sitede görünmez.
-  const allTafsirs = await prisma.tafsir.findMany({
-    where: {
-      contents: {
-        some: { ayahId: ayet.id, modernizedAt: { not: null } },
-      },
-    },
-    orderBy: { order: "asc" },
-    select: {
-      id: true,
-      code: true,
-      name: true,
-      slug: true,
-      author: true,
-      deathYearHijri: true,
-      deathYearGregorian: true,
-    },
-  });
+  const allTafsirs = await getAyahTafsirs(ayet.id);
+
+  // SSR seed: sunucunun bildiği varsayılan tefsirin metnini sayfayla birlikte gönder
+  // → istemci, açılışta ayrı bir fetch turu beklemeden metni anında gösterir.
+  // Varsayılan = URL ?tafsir= (geçerliyse), yoksa ilk tefsir. (sessionStorage tercihi
+  // istemcide olduğundan burada bilinemez; farklıysa istemci kendi yükler.)
+  let initialTafsir: TafsirData | null = null;
+  const seedId =
+    focusTafsirId && allTafsirs.some((t) => t.id === focusTafsirId)
+      ? focusTafsirId
+      : allTafsirs[0]?.id;
+  if (seedId) {
+    const raw = await getModernizedTafsirRaw(seedId, ayet.id);
+    if (raw) {
+      const { text, trimStart } = cleanTafsirText(raw.text, aNo);
+      initialTafsir = {
+        tafsir: { id: raw.tafsirId, code: raw.code, name: raw.name },
+        text,
+        textTrimStart: trimStart,
+        modernizedAt: raw.modernizedAt,
+        modernizedBy: raw.modernizedBy,
+        highlights: [],
+        notes: [],
+      };
+    }
+  }
 
   const canonical = `https://tefsir.net/oku/${sId}/${aNo}`;
   const ayahJsonLd = [
@@ -170,6 +182,7 @@ export default async function AyahPage({
           surahName={surahMeta.nameTr}
           tafsirs={allTafsirs}
           initialTafsirId={focusTafsirId}
+          initialTafsir={initialTafsir}
           focusHighlightId={focusHighlight}
           focusNoteId={focusNote}
           focusFind={focusFind}

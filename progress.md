@@ -7,6 +7,26 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-06 (6. iş) — Performans: bölge + sorgu paralelleştirme + tefsir SSR seed
+
+Kullanıcı sitenin genel hızlanmasını (tefsir açma + arama sonuçları) istedi. Tahmin yerine önce ölçüm yapıldı (`scripts/perf-measure.ts` — sadece okur: row count + EXPLAIN ANALYZE + sorgu timing).
+
+**Ölçüm bulguları:**
+- **Asıl darboğaz: ağ gecikmesi / bölge uyumsuzluğu.** Her DB sorgusu DB içinde 7-19 ms'de bitiyor (EXPLAIN), ama toplam round-trip ~480 ms. Sebep: Neon **eu-central-1 (Frankfurt)**, ama `vercel.json` yok → Vercel fonksiyonları varsayılan **iad1 (ABD)** → her sorgu Atlantik ötesi ~95 ms.
+- Okuyucu sayfası 5-6 sorguyu **seri** yapıyor; client tarafı tefsir açılışı 2-3 round-trip daha (HTML→hydrate→fetch şelalesi).
+- **Arama indeksi (pg_trgm) şu an GEREKSİZ**: TafsirContent 68.552 satır ama sadece **612'si sadeleştirilmiş** (aranan tek küme); tefsir araması `(tafsirId, modernizedAt)` indeksiyle 7 ms. pg_trgm modernizasyon 68k'ya ölçeklenince gerekecek → ertelendi.
+
+**Uygulananlar:**
+1. **`vercel.json` → `regions: ["fra1"]`** (Frankfurt, Neon ile aynı bölge). En yüksek etki: her DB round-trip ~95ms → ~birkaç ms. ⚠️ Vercel deploy sonrası fonksiyon bölgesinin gerçekten fra1 olduğu Vercel dashboard'dan doğrulanmalı.
+2. **Okuyucu sorgu optimizasyonu** (`src/lib/reader-data.ts`): React `cache` ile sûre/ayet sorguları generateMetadata + sayfa gövdesi arasında paylaşılıyor (tekrar round-trip yok); bağımsız sorgular `Promise.all`; 114 sûre listesi `unstable_cache` (1 gün revalidate, `surahs` tag) ile istekler arası önbellekte.
+3. **Tefsir SSR seed**: varsayılan tefsirin (URL `?tafsir=` ya da ilk tefsir) metni sayfayla birlikte sunucuda render edilip `initialTafsir` prop'uyla `TafsirReader`'a geçiyor → açılışta metin **anında** görünür, client fetch şelalesi kalkar. Statik metin `getModernizedTafsirRaw` ile `unstable_cache`'te (`tafsir-content` tag). Misafirde (not/vurgu yok) ilk fetch turu tamamen atlanıyor; girişlide metin görünürken not/vurgular arka planda yükleniyor. Tefsir değişiminde eski metin temizlenip spinner gösteriliyor (bayat içerik yok).
+
+tsc temiz, lint temiz (yalnız önceden var olan font uyarısı), `npm run build` EXIT=0. (Build sırasındaki `prisma:error` satırları shell'deki `file:./dev.db` miras tuzağı — dinamik route'lar prerender edilmediğinden build'i bozmaz; Vercel'de doğru env kullanılır.)
+
+NOT: JWT session kullanıldığı için `auth()` her API çağrısında DB'ye gitmiyor (darboğaz değil). `scripts/perf-measure.ts` yeniden kullanılabilir tanı aracı olarak bırakıldı.
+
+---
+
 ### 2026-06-06 (5. iş) — SEO III: sitelinks arama kutusu + iç bağlantı + noindex hijyeni
 
 (Not: 4. iş sonrası OG fontu top-level fs okuması Vercel'de tüm siteyi 500 yapmıştı; commit e917b57 ile font CDN'den lazy fetch'e çevrilip çözüldü.)

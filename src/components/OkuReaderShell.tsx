@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AyahStickyHeader } from "@/components/AyahStickyHeader";
-import { TafsirReader, type TafsirSummary } from "@/components/TafsirReader";
+import { TafsirReader, type TafsirSummary, type TafsirData } from "@/components/TafsirReader";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import { resolveInitialTafsirId, setPreferredTafsirId } from "@/lib/preferred-tafsir";
 
@@ -26,6 +26,7 @@ export function OkuReaderShell({
   surahName,
   tafsirs,
   initialTafsirId,
+  initialTafsir,
   focusHighlightId,
   focusNoteId,
   focusFind,
@@ -41,6 +42,8 @@ export function OkuReaderShell({
   surahName: string;
   tafsirs: TafsirSummary[];
   initialTafsirId?: number;
+  /** Sunucuda hazırlanan varsayılan tefsir metni (SSR seed) — açılış hızı için */
+  initialTafsir?: TafsirData | null;
   focusHighlightId?: string;
   focusNoteId?: string;
   focusFind?: string;
@@ -107,6 +110,7 @@ export function OkuReaderShell({
         surahName={surahName}
         tafsirs={tafsirs}
         selectedId={selectedId}
+        initialTafsir={initialTafsir}
         onSelectedIdChange={handleTafsirChange}
         showNotes={showNotes}
         onShowNotesChange={setShowNotes}

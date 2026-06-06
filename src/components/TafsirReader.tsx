@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   TafsirContentView,
   type Highlight,
@@ -24,7 +24,7 @@ export type TafsirSummary = {
   deathYearGregorian: number | null;
 };
 
-type TafsirData = {
+export type TafsirData = {
   tafsir: { id: number; code: string; name: string };
   text: string;
   /** Ham metnin başından temizlenen karakter sayısı (offset dönüşümü için) */
@@ -48,6 +48,7 @@ export function TafsirReader({
   surahName,
   tafsirs,
   selectedId,
+  initialTafsir,
   onSelectedIdChange,
   showNotes,
   onShowNotesChange,
@@ -64,6 +65,8 @@ export function TafsirReader({
   surahName: string;
   tafsirs: TafsirSummary[];
   selectedId: number | null;
+  /** Sunucuda hazırlanan varsayılan tefsir metni (SSR seed) — açılış hızı için */
+  initialTafsir?: TafsirData | null;
   onSelectedIdChange: (id: number) => void;
   showNotes: boolean;
   onShowNotesChange: (v: boolean) => void;
@@ -84,7 +87,12 @@ export function TafsirReader({
   const searchParams = useSearchParams();
   const [readTafsirIds, setReadTafsirIds] = useState<Set<number>>(new Set());
   const [flashTafsirRing, setFlashTafsirRing] = useState(false);
-  const [data, setData] = useState<TafsirData | null>(null);
+  // SSR seed bu açılışta seçili tefsire aitse, metni anında göster (fetch beklemeden).
+  const [data, setData] = useState<TafsirData | null>(() =>
+    initialTafsir && initialTafsir.tafsir.id === selectedId ? initialTafsir : null
+  );
+  // Sunucudan gelen seed'in tefsir id'si — ilk yüklemede gereksiz fetch turunu atlamak için
+  const seededId = useRef<number | null>(initialTafsir?.tafsir.id ?? null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hiddenNoteIds, setHiddenNoteIds] = useState<Set<string>>(new Set());
@@ -103,6 +111,9 @@ export function TafsirReader({
     async (tafsirId: number) => {
       setLoading(true);
       setLoadError(null);
+      // Başka tefsire geçiliyorsa eski metni temizle (spinner görünsün). Aynı tefsir
+      // için (SSR seed metnini not/vurgu ile tazeleme) metni koru → ekran boşalmaz.
+      setData((prev) => (prev && prev.tafsir.id === tafsirId ? prev : null));
       try {
         const r = await fetch(`/api/tafsir/${surahId}/${ayahNo}/${tafsirId}`);
         if (!r.ok) {
@@ -122,8 +133,20 @@ export function TafsirReader({
   );
 
   useEffect(() => {
-    if (selectedId != null) loadTafsir(selectedId);
-  }, [selectedId, loadTafsir]);
+    if (selectedId == null) return;
+    // SSR seed bu tefsire ait ve metin zaten ekranda ise:
+    if (seededId.current === selectedId && data?.tafsir.id === selectedId) {
+      // Misafir → not/vurgu yok, fetch turuna hiç gerek yok.
+      if (status === "unauthenticated") return;
+      // Oturum henüz çözülmedi → metin görünürken çözülmesini bekle (boşuna fetch yok).
+      if (status === "loading") return;
+      // Girişli kullanıcı → metin görünüyor; not/vurgular için arka planda tazele.
+    }
+    loadTafsir(selectedId);
+    // data kasıtlı olarak bağımlılıkta değil: yalnızca ilk yükleme/seçim/oturum
+    // değişiminde karar verilir, her data güncellemesinde değil.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId, loadTafsir, status]);
 
   // Bu ayet için okundu işaretleri
   useEffect(() => {
@@ -464,13 +487,15 @@ export function TafsirReader({
           flashTafsirRing ? "ring-2 ring-amber-500" : ""
         }`}
       >
-        {loading && <div className="text-stone-500 dark:text-stone-400">Yükleniyor...</div>}
-        {!loading && loadError && !showNotes && (
+        {loading && !data && (
+          <div className="text-stone-500 dark:text-stone-400">Yükleniyor...</div>
+        )}
+        {loadError && !data && !showNotes && (
           <div className="rounded border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-3 text-sm text-amber-800 dark:text-amber-200">
             {loadError}
           </div>
         )}
-        {!loading && data && !showNotes && (
+        {data && !showNotes && (
           <>
             {data.modernizedAt && (
               <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs">
