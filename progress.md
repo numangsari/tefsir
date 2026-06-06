@@ -7,6 +7,14 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-06 (9. iş) — Ana sayfa güncellemeleri + okuma ilerlemesi
+
+Kullanıcı ana sayfa ve birkaç UI iyileştirmesi istedi (ekran görüntüsüyle).
+
+**Uygulananlar:** (1) Hero açıklama metni "…sadeleştirilmiş ve anlaşılır biçimde **okuyun**. Kelime kelime meal…" olarak güncellendi. (2) Hero'da yalnız sembol vardı; sembolün (BrandMark) sağına büyük **"tefsir.net"** kelime markası eklendi (yan yana). (3) `TopBar`'daki hadis-i şerif fontu büyütüldü (`text-xs`→`text-base` + serif). (4) `TopBar` sağ üst arama ikonu büyütüldü (`text-lg`→`text-2xl`, buton `w-8`→`w-9`). (5) **Hesabım → "Okuma ilerlemesi"** bölümü: `GET /api/my/progress` raw SQL ile her sûrede okunan tefsir-metni (TafsirReadMark) / o sûredeki toplam tefsir içeriği (TafsirContent) oranını döner; profilde her başlanan sûre için **yüzde + ilerleme barı** + okunan/toplam + sûreye link. OKU butonuyla işaretlenen tefsirler zaten okundu sayılıyordu; ilerleme bunun üzerine kuruldu.
+
+**Karar (kullanıcıyla):** yüzde = **tam tefsir kapsamı** (payda = o sûredeki gerçek TafsirContent sayısı — ayetCount×11 değil, çünkü her ayette 11 tefsir içeriği olmayabilir; gerçek sayı kullanılınca %100 ulaşılabilir kalır). Liste yalnız başlanan sûreleri gösterir. **Yeni DB kolonu yok**, deploy ile çalışır. tsc/build temiz.
+
 ### 2026-06-06 (8. iş, ek) — İletişim yanıtı site adına gönderiliyor
 
 Kullanıcı fark etti: panelden "Yanıtla" deyince cevap kendi şahsi Gmail'inden gidiyor (çünkü buton sadece `mailto:` linkiydi, Mac Mail uygulamasını açıyordu). Beklenen: yanıt tefsir.net adından gitsin.

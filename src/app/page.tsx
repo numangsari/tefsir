@@ -69,15 +69,21 @@ export default async function Home() {
         {/* Hero */}
         <section className="bg-emerald-800 dark:bg-emerald-950 text-emerald-50">
           <div className="mx-auto max-w-4xl px-4 py-16 md:py-24 text-center">
-            <BrandMark className="h-16 w-16 mx-auto mb-6" />
+            <div className="flex items-center justify-center gap-3 mb-7">
+              <BrandMark className="h-14 w-14 shrink-0" />
+              <span className="font-serif text-4xl md:text-5xl font-bold tracking-tight leading-none">
+                <span className="text-white">tefsir</span>
+                <span className="text-amber-300">.net</span>
+              </span>
+            </div>
             <h1 className="text-3xl md:text-5xl font-serif font-bold tracking-tight">
               Kur&apos;an-ı Kerim&apos;i{" "}
               <span className="text-amber-300">11 klasik tefsir</span> ile okuyun
             </h1>
             <p className="mt-5 text-base md:text-lg text-emerald-100/90 max-w-2xl mx-auto leading-relaxed">
               Taberî&apos;den Kurtubî&apos;ye, Fahreddin Râzî&apos;den İbn Kesîr&apos;e — klasik
-              tefsirleri ayet ayet, günümüz Türkçesine sadeleştirilmiş ve anlaşılır biçimde.
-              Kelime kelime meal, vurgulama ve not alma ile anlayarak okuma.
+              tefsirleri ayet ayet, günümüz Türkçesine sadeleştirilmiş ve anlaşılır biçimde
+              okuyun. Kelime kelime meal, vurgulama ve not alma ile anlayarak okuma.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

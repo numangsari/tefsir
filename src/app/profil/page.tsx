@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { signOutCompletely } from "@/lib/sign-out";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/Toaster";
@@ -15,6 +16,15 @@ type Profile = {
   noteCount: number;
 };
 
+type SurahProgress = {
+  surahId: number;
+  nameTr: string;
+  ayetCount: number;
+  read: number;
+  total: number;
+  percent: number;
+};
+
 export default function ProfilePage() {
   const { update } = useSession();
   const toast = useToast();
@@ -22,6 +32,9 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Okuma ilerlemesi
+  const [progress, setProgress] = useState<SurahProgress[] | null>(null);
 
   // Şifre değiştir
   const [curr, setCurr] = useState("");
@@ -44,6 +57,18 @@ export default function ProfilePage() {
         setName(d.name ?? "");
       }
       setLoading(false);
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const r = await fetch("/api/my/progress", { cache: "no-store" });
+      if (r.ok) {
+        const d = (await r.json()) as { surahs: SurahProgress[] };
+        setProgress(d.surahs);
+      } else {
+        setProgress([]);
+      }
     })();
   }, []);
 
@@ -137,6 +162,56 @@ export default function ProfilePage() {
             {p.highlightCount} vurgu · {p.noteCount} not
           </dd>
         </dl>
+      </section>
+
+      {/* Okuma ilerlemesi */}
+      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+        <h2 className="font-medium mb-1 text-stone-800 dark:text-stone-100">
+          Okuma ilerlemesi
+        </h2>
+        <p className="text-xs text-stone-500 dark:text-stone-400 mb-4">
+          Bir tefsiri OKU ile işaretledikçe ilgili sûrenin ilerlemesi artar. Yüzde, o
+          sûrede okuduğunuz tefsir metinlerinin toplam tefsir metinlerine oranıdır.
+        </p>
+
+        {progress === null ? (
+          <p className="text-sm text-stone-400 dark:text-stone-500">Yükleniyor…</p>
+        ) : progress.length === 0 ? (
+          <p className="text-sm text-stone-500 dark:text-stone-400">
+            Henüz okuma kaydınız yok.{" "}
+            <Link href="/oku" className="text-emerald-700 dark:text-emerald-400 hover:underline">
+              Tefsir okumaya başlayın →
+            </Link>
+          </p>
+        ) : (
+          <ul className="space-y-3.5">
+            {progress.map((s) => (
+              <li key={s.surahId}>
+                <div className="flex items-baseline justify-between gap-2 mb-1 text-sm">
+                  <Link
+                    href={`/oku/${s.surahId}/1`}
+                    className="font-medium text-stone-800 dark:text-stone-100 hover:text-emerald-700 dark:hover:text-emerald-400 truncate"
+                  >
+                    {s.nameTr} Sûresi
+                  </Link>
+                  <span className="shrink-0 tabular-nums text-stone-500 dark:text-stone-400">
+                    %{s.percent}
+                    <span className="text-stone-400 dark:text-stone-500">
+                      {" "}
+                      · {s.read}/{s.total}
+                    </span>
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-stone-200 dark:bg-stone-800 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-emerald-500 transition-[width]"
+                    style={{ width: `${s.percent}%` }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       {/* İsim */}

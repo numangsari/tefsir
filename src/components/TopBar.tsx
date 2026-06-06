@@ -32,7 +32,7 @@ export function TopBar({
         <BrandLogo />
       </Link>
 
-      <div className="hidden lg:block text-center text-emerald-100/90 text-xs italic">
+      <div className="hidden lg:block text-center text-emerald-100/90 text-base italic font-serif">
         “Sizin en hayırlınız, Kur&apos;an&apos;ı öğrenen ve öğretendir.”
       </div>
 
@@ -40,11 +40,11 @@ export function TopBar({
       <nav className="hidden md:flex items-center gap-2">
         <Link
           href="/arama"
-          className="w-8 h-8 flex items-center justify-center rounded hover:bg-emerald-700"
+          className="w-9 h-9 flex items-center justify-center rounded hover:bg-emerald-700"
           aria-label="Arama"
           title="Arama"
         >
-          <span className="text-lg leading-none" aria-hidden>
+          <span className="text-2xl leading-none" aria-hidden>
             ⌕
           </span>
         </Link>
