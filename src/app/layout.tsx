@@ -48,10 +48,12 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
-  // Google Search Console doğrulama kodu (Vercel'de GOOGLE_SITE_VERIFICATION env'i)
-  verification: process.env.GOOGLE_SITE_VERIFICATION
-    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
-    : undefined,
+  // Google Search Console doğrulama kodu (env verilirse onu kullanır)
+  verification: {
+    google:
+      process.env.GOOGLE_SITE_VERIFICATION ??
+      "HVa1PXwwAujvd2xa4bixm3niFnGCge3Evs_OEKZ75ww",
+  },
 };
 
 const siteJsonLd = [
