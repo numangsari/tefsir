@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AyahStickyHeader } from "@/components/AyahStickyHeader";
 import { TafsirReader, type TafsirSummary } from "@/components/TafsirReader";
+import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import { resolveInitialTafsirId, setPreferredTafsirId } from "@/lib/preferred-tafsir";
 
 type SurahMeta = {
@@ -43,6 +45,7 @@ export function OkuReaderShell({
   focusFind?: string;
   flash?: string;
 }) {
+  const router = useRouter();
   const [selectedId, setSelectedId] = useState<number | null>(() =>
     resolveInitialTafsirId(tafsirs, initialTafsirId)
   );
@@ -53,6 +56,29 @@ export function OkuReaderShell({
     setSelectedId(id);
     setShowNotes(false);
   }, []);
+
+  // Verilen tefsirden sonrakine; o son tefsirse sıradaki ayete (gerekirse sonraki sûre) geçer
+  const handleAdvance = useCallback(
+    (fromTafsirId: number | null) => {
+      const idx = tafsirs.findIndex((t) => t.id === fromTafsirId);
+      const nextTafsir = idx >= 0 ? tafsirs[idx + 1] : undefined;
+      if (nextTafsir) {
+        setPreferredTafsirId(nextTafsir.id);
+        setSelectedId(nextTafsir.id);
+        setShowNotes(false);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      // Son tefsirdeyiz → sıradaki ayet
+      const qs = fromTafsirId ? `?tafsir=${fromTafsirId}` : "";
+      if (ayahNo < surahMeta.ayetCount) {
+        router.push(`/oku/${surahMeta.id}/${ayahNo + 1}${qs}`);
+      } else if (surahMeta.id < 114) {
+        router.push(`/oku/${surahMeta.id + 1}/1${qs}`);
+      }
+    },
+    [tafsirs, ayahNo, surahMeta.id, surahMeta.ayetCount, router]
+  );
 
   return (
     <>
@@ -82,11 +108,13 @@ export function OkuReaderShell({
         onSelectedIdChange={handleTafsirChange}
         showNotes={showNotes}
         onShowNotesChange={setShowNotes}
+        onAdvance={handleAdvance}
         focusHighlightId={focusHighlightId}
         focusNoteId={focusNoteId}
         focusFind={focusFind}
         flash={flash}
       />
+      <ScrollToTopButton />
     </>
   );
 }

@@ -7,6 +7,21 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-06 — Okuyucu akışı iyileştirmeleri (gezinme, temizlik, UX)
+
+Okuma deneyimine yönelik 7 küçük iyileştirme yapıldı:
+
+- **OKU butonu ile ilerleme**: Bir tefsiri "okundu" işaretleyince otomatik olarak sıradaki tefsire; o son tefsirse sıradaki ayete (gerekirse sonraki sûreye) geçilir. Gezinme mantığı `OkuReaderShell.handleAdvance` içinde; `TafsirReader`'a `onAdvance` prop'u olarak iletildi.
+- **"Sıradaki" butonu**: Tefsir metninin en altına eklendi (metnin sonuna inince görünür); OKU butonuyla aynı ilerlemeyi yapar (son tefsirse "Sıradaki ayet", değilse "Sıradaki tefsir").
+- **Metin temizliği**: Bazı tefsirlerin baş/sonundaki ayet numarası işareti ("(6)" gibi) kaldırıldı. Tek kaynak `src/lib/clean-tafsir-text.ts` (`cleanTafsirText` → `{ text, trimStart }`); sadece parantezli sayı veya tam ayet numarasına eşit çıplak sayı atılır. Hem `/api/tafsir/.../route.ts` hem yazdırma sayfasında uygulanır; vurgu/notlar `trimStart` kadar sola kaydırılır, yeni eklenenler `textTrimStart` ile ham koordinata geri çevrilir (DB ham metne göre tutarlı kalır).
+- **"En üste çık" butonu**: `ScrollToTopButton` — sayfa 400px'ten fazla kaydırılınca beliren yüzen buton.
+- **Not ekleme çift tıklama**: Tek tıkla kazara not açılması yerine artık çift tıklama gerekiyor (`TafsirContentView` `onDoubleClick`; çift tıkta tarayıcının seçtiği kelime temizleniyor).
+- **Arapça tooltip çakışması**: Kelime Türkçesi tooltip'i yukarı yerine aşağı açılıyor (üstteki sticky panelle çakışma giderildi).
+- **Banner metni**: "Metin günümüz Türkçesine sadeleştirildi, hata bulunabilir." olarak güncellendi.
+- tsc temiz, lint temiz (yalnızca önceden var olan font uyarısı), `next build` compiled successfully.
+
+---
+
 ### 2026-06-04 (3. iş) — Soft delete + audit log (denetim kaydı)
 
 Yönetici paneline iki güvenlik özelliği eklendi: kullanıcı silme artık geri alınabilir (soft delete) ve tüm admin işlemleri denetim kaydına yazılıyor.

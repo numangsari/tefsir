@@ -301,20 +301,19 @@ export function TafsirContentView({
     return () => window.clearTimeout(t);
   }, [focusFind, segments, pathname, router, searchParams]);
 
-  // Boş alana / metne tıkla → not ekle (sadece seçim yokken)
-  function handleClick(e: React.MouseEvent<HTMLDivElement>) {
-    // Vurguya/notu zaten tıklamadıysa
+  // Metne çift tıkla → not ekle (tek tıkla kazara not açılmasını önler)
+  function handleAddNote(e: React.MouseEvent<HTMLDivElement>) {
+    // Vurgu/not öğesine tıklandıysa atla
     const target = e.target as HTMLElement;
     if (target.closest("[data-skip-add-note]")) return;
-
-    // Seçim varsa hiçbir şey yapma (sağ panelden vurgu/not ekleyecek)
-    const sel = window.getSelection();
-    if (sel && !sel.isCollapsed && sel.toString().length > 0) return;
 
     const root = containerRef.current;
     if (!root) return;
     const pos = offsetFromClick(root, e);
     if (pos < 0) return;
+    // Çift tıklamada tarayıcı kelimeyi seçer; seçimi temizle ki vurgu aracı açılmasın
+    window.getSelection()?.removeAllRanges();
+    onSelectionChange(null);
     const ctxStart = Math.max(0, pos - 25);
     const ctxEnd = Math.min(text.length, pos + 25);
     const anchorText = text.slice(ctxStart, ctxEnd).replace(/\s+/g, " ").trim();
@@ -333,12 +332,12 @@ export function TafsirContentView({
         </div>
       </div>
       <p className="text-xs text-stone-500 dark:text-stone-400 mb-3">
-        Tefsire tıklayarak hızlıca not ekleyebilir, metin seçerek vurgu yapabilirsiniz.
+        Tefsire çift tıklayarak hızlıca not ekleyebilir, metin seçerek vurgu yapabilirsiniz.
       </p>
 
       <div
         ref={containerRef}
-        onClick={handleClick}
+        onDoubleClick={handleAddNote}
         className="tefsir-body whitespace-pre-wrap text-stone-800 dark:text-stone-200 select-text cursor-text"
       >
         {segments.map((seg, i) => {

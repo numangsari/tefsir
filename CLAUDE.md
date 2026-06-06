@@ -23,7 +23,9 @@ Next.js App Router; API route'ları `src/app/api/` altında. Tefsir verisi Postg
 | `src/app/oku/[surah]/[ayah]/page.tsx` | Ana okuyucu sayfası |
 | `src/components/TafsirReader.tsx` | Tefsir listesi + içerik paneli |
 | `src/components/OkuReaderShell.tsx` | Sticky başlık + okuyucu birleşimi |
-| `src/components/AyahWordBridge.tsx` | Arapça–meal çift yönlü kelime vurgusu |
+| `src/components/AyahWordBridge.tsx` | Arapça–meal çift yönlü kelime vurgusu (tooltip kelimenin altında açılır) |
+| `src/components/ScrollToTopButton.tsx` | Sayfa kaydırılınca beliren "en üste çık" yüzen butonu |
+| `src/lib/clean-tafsir-text.ts` | Tefsir metni baş/sonundaki ayet numarası işaretini temizler (`cleanTafsirText` → `{ text, trimStart }`); API + yazdırma sayfası kullanır |
 | `src/components/AuthUnified.tsx` | Giriş/kayıt birleşik ekranı |
 | `src/app/yonetici/page.tsx` | Yönetici paneli — 5 sekmeli kabuk (Genel Bakış / Trafik / Kullanıcılar / İçerik / Denetim) |
 | `src/app/yonetici/{ui,types}.tsx/ts` | Panel ortak UI bileşenleri (Tabs, StatCard, ProgressBar, SparkArea — bağımlılıksız SVG) + paylaşılan tipler |
@@ -78,6 +80,7 @@ npx prisma studio    # DB görsel arayüzü
 - [ ] Yeni özellik veya hata bildirimi gelirse buraya ekle
 
 ## Son Güncelleme
-2026-06-04 (3. iş) — Soft delete + audit log. `User.deletedAt` + yeni `AuditLog` (Neon'a db push edildi). Kullanıcı silme artık geri alınabilir (soft); `?permanent=1` hard delete; `auth.ts` silinmiş hesabı reddediyor; `restore` ile geri yükleme. Tüm admin işlemleri `lib/audit.ts` → AuditLog'a yazılıyor; yeni "Denetim Kaydı" sekmesi (panel 5 sekme). tsc/lint/build temiz.
+2026-06-06 — Okuyucu akışı iyileştirmeleri (7 küçük UX): (1) OKU butonu okundu işaretleyince sıradaki tefsire/ayete geçiyor; (2) tefsir metni sonunda "Sıradaki" butonu — ikisi de `OkuReaderShell.handleAdvance` (`onAdvance` prop'u); (3) baş/sondaki ayet numarası ("(6)") temizliği `src/lib/clean-tafsir-text.ts` ile (API + yazdırma sayfasında; vurgu/not offset'leri `trimStart` kadar kaydırılıyor, yeni eklenenler `textTrimStart` ile ham koordinata çevriliyor); (4) `ScrollToTopButton`; (5) not ekleme artık çift tıklama; (6) Arapça tooltip aşağı açılıyor (çakışma giderildi); (7) banner "…hata bulunabilir". tsc/lint/build temiz.
+Önceki iş (2026-06-04, 3.) — Soft delete + audit log. `User.deletedAt` + yeni `AuditLog` (Neon'a db push edildi). Kullanıcı silme artık geri alınabilir (soft); `?permanent=1` hard delete; `auth.ts` silinmiş hesabı reddediyor; `restore` ile geri yükleme. Tüm admin işlemleri `lib/audit.ts` → AuditLog'a yazılıyor; yeni "Denetim Kaydı" sekmesi (panel 5 sekme). tsc/lint/build temiz.
 Önceki iş (2026-06-04, 2.) — Site trafiği analitiği eklendi. Vercel Web Analytics verisi API ile çekilemiyor (hiçbir planda public endpoint yok) → **kendi çerezsiz analitiğimiz** kuruldu: `PageView` modeli (Neon'a db push edildi), public `/api/track` (visitorKey = günlük tuz+IP+UA hash, ham IP saklanmaz), layout'ta `AnalyticsTracker` (sendBeacon, `/yonetici` hariç), ADMIN `/api/admin/analytics`, yeni **Trafik sekmesi** (panel artık 4 sekme). Ayrıca `@vercel/analytics` + `<Analytics />` eklendi (Vercel dashboard'da görünür, panele bağlanamaz). tsc/lint/build temiz (`next build` sandbox kapalı çalışır).
 Önceki iş (2026-06-04, 1.): Yönetici paneli 3 sekmeye dönüştürüldü (Genel Bakış/Kullanıcılar/İçerik), bağımlılıksız SVG grafikler, content API. Commit'lendi (3392b38).

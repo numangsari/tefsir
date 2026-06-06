@@ -46,10 +46,10 @@ export function AyahArabicWithTooltip({
             {showTip && (
               <span
                 role="tooltip"
-                className="absolute bottom-full left-1/2 z-20 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-stone-800 px-2.5 py-1 text-xs font-sans text-white shadow-lg dark:bg-stone-700 pointer-events-none"
+                className="absolute top-full left-1/2 z-30 mt-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-stone-800 px-2.5 py-1 text-xs font-sans text-white shadow-lg dark:bg-stone-700 pointer-events-none"
               >
                 {w.tr}
-                <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-stone-800 dark:border-t-stone-700" />
+                <span className="absolute left-1/2 bottom-full -translate-x-1/2 border-4 border-transparent border-b-stone-800 dark:border-b-stone-700" />
               </span>
             )}
           </span>

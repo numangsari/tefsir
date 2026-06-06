@@ -26,6 +26,8 @@ export type TafsirSummary = {
 type TafsirData = {
   tafsir: { id: number; code: string; name: string };
   text: string;
+  /** Ham metnin başından temizlenen karakter sayısı (offset dönüşümü için) */
+  textTrimStart: number;
   modernizedAt: string | null;
   modernizedBy: string | null;
   highlights: Highlight[];
@@ -48,6 +50,7 @@ export function TafsirReader({
   onSelectedIdChange,
   showNotes,
   onShowNotesChange,
+  onAdvance,
   focusHighlightId,
   focusNoteId,
   focusFind,
@@ -62,6 +65,8 @@ export function TafsirReader({
   onSelectedIdChange: (id: number) => void;
   showNotes: boolean;
   onShowNotesChange: (v: boolean) => void;
+  /** Verilen tefsirden bir sonrakine; o son tefsirse sıradaki ayete geçer */
+  onAdvance: (fromTafsirId: number | null) => void;
   focusHighlightId?: string;
   focusNoteId?: string;
   focusFind?: string;
@@ -153,20 +158,28 @@ export function TafsirReader({
   async function createHighlight(color: string) {
     if (!activeSelection || !data) return;
     if (!requireAuth()) return;
+    // Offset'ler temiz metne göre; DB'ye ham koordinatla (textTrimStart eklenerek) yazılır
+    const trim = data.textTrimStart;
     const r = await fetch("/api/highlights", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         tafsirId: data.tafsir.id,
         ayahId,
-        startOffset: activeSelection.start,
-        endOffset: activeSelection.end,
+        startOffset: activeSelection.start + trim,
+        endOffset: activeSelection.end + trim,
         color,
         text: activeSelection.snippet,
       }),
     });
     if (r.ok) {
-      const newHl = (await r.json()) as Highlight;
+      const saved = (await r.json()) as Highlight;
+      // Yerel görünüm temiz metne göre olduğundan ham koordinattan geri çevrilir
+      const newHl: Highlight = {
+        ...saved,
+        startOffset: saved.startOffset - trim,
+        endOffset: saved.endOffset - trim,
+      };
       setData((d) =>
         d
           ? {
@@ -199,19 +212,21 @@ export function TafsirReader({
 
   async function saveDraftNote(body: string, hideOnSave: boolean) {
     if (!draftNote || !data) return;
+    const trim = data.textTrimStart;
     const r = await fetch("/api/notes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         tafsirId: data.tafsir.id,
         ayahId,
-        position: draftNote.position,
+        position: draftNote.position + trim,
         anchorText: draftNote.anchorText,
         body,
       }),
     });
     if (r.ok) {
-      const newNote = (await r.json()) as Note;
+      const saved = (await r.json()) as Note;
+      const newNote: Note = { ...saved, position: saved.position - trim };
       setData((d) =>
         d
           ? {
@@ -293,6 +308,8 @@ export function TafsirReader({
         else next.add(tafsirId);
         return next;
       });
+      // Yeni okundu işaretlendiyse sıradaki tefsire (son tefsirse sıradaki ayete) geç
+      if (!marked) onAdvance(tafsirId);
     } else {
       toast.error("Okundu işareti kaydedilemedi.");
     }
@@ -424,7 +441,7 @@ export function TafsirReader({
             {data.modernizedAt && (
               <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs">
                 <div className="text-emerald-800 dark:text-emerald-200">
-                  Metin günümüz Türkçesine sadeleştirildi.
+                  Metin günümüz Türkçesine sadeleştirildi, hata bulunabilir.
                 </div>
               </div>
             )}
@@ -449,6 +466,22 @@ export function TafsirReader({
               focusNoteId={focusNoteId}
               focusFind={focusFind}
             />
+            {(() => {
+              const idx = tafsirs.findIndex((t) => t.id === selectedId);
+              const isLastTafsir = idx === tafsirs.length - 1;
+              return (
+                <div className="mt-8 pt-5 border-t border-stone-200 dark:border-stone-800 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => onAdvance(selectedId)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-800 transition-colors"
+                  >
+                    {isLastTafsir ? "Sıradaki ayet" : "Sıradaki tefsir"}
+                    <span aria-hidden>→</span>
+                  </button>
+                </div>
+              );
+            })()}
           </>
         )}
         {!loading && showNotes && (

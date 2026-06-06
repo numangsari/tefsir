@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { cleanTafsirText } from "@/lib/clean-tafsir-text";
 import { PrintView } from "./PrintView";
 
 export default async function PrintPage({
@@ -43,6 +44,10 @@ export default async function PrintPage({
       ])
     : [[], []];
 
+  // Okuyucuyla aynı temizlik: baş/sondaki ayet numarası atılır, offset'ler kaydırılır
+  const { text: cleanText, trimStart } = cleanTafsirText(content.text, aNo);
+  const cleanLen = cleanText.length;
+
   return (
     <PrintView
       surahName={ayet.surah.nameTr}
@@ -50,20 +55,29 @@ export default async function PrintPage({
       arabic={ayet.arabic}
       meal={ayet.meal}
       tafsirName={content.tafsir.name}
-      text={content.text}
-      highlights={highlights.map((h) => ({
-        id: h.id,
-        startOffset: h.startOffset,
-        endOffset: h.endOffset,
-        text: h.text,
-        color: h.color,
-      }))}
-      notes={notes.map((n) => ({
-        id: n.id,
-        position: n.position,
-        anchorText: n.anchorText,
-        body: n.body,
-      }))}
+      text={cleanText}
+      highlights={highlights
+        .map((h) => ({
+          id: h.id,
+          startOffset: h.startOffset - trimStart,
+          endOffset: h.endOffset - trimStart,
+          text: h.text,
+          color: h.color,
+        }))
+        .filter((h) => h.endOffset > 0 && h.startOffset < cleanLen)
+        .map((h) => ({
+          ...h,
+          startOffset: Math.max(0, h.startOffset),
+          endOffset: Math.min(cleanLen, h.endOffset),
+        }))}
+      notes={notes
+        .map((n) => ({
+          id: n.id,
+          position: n.position - trimStart,
+          anchorText: n.anchorText,
+          body: n.body,
+        }))
+        .filter((n) => n.position >= 0 && n.position <= cleanLen)}
     />
   );
 }
