@@ -7,6 +7,18 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-06 (3. iş) — Logo, marka kimliği ve SEO başlangıcı + Sıradaki konumu
+
+İlk "internette görünür olma" adımları ve okuyucu yerleşim düzeltmesi:
+
+- **"Sıradaki" butonu sağ panele alındı**: Artık tefsirin en altına inmeden de görünüyor — sağ panel sticky bir flex sütun; vurgu/not listesi içte kayıyor, "Sıradaki tefsir/ayet" butonu panelin altına sabit. Çakışmasın diye **"en üste çık" butonu sol alta** taşındı.
+- **Logo**: `BrandLogo`/`BrandMark` (bağımsız SVG — açık kitap işareti + "tefsir.net" kelime markası); üst çubukta düz metin yerine kullanılıyor. Favicon: `src/app/icon.svg` (Next otomatik favicon).
+- **Sekme başlığı + per-sayfa başlık**: `layout.tsx` metadata yenilendi — `title` artık `{ default, template: "%s · tefsir.net" }`. Okuyucu sayfasına `generateMetadata` eklendi → ör. "Bakara Sûresi 6. ayet · tefsir.net" + meal'den açıklama. Sûreler sayfasına da başlık.
+- **SEO altyapısı**: `metadataBase`, description, keywords, openGraph, twitter, robots meta; `src/app/robots.ts` (yönetici/panel/api/yazdir kapalı) ve `src/app/sitemap.ts` (yalnızca sadeleştirilmiş içeriği olan ayet sayfaları + ana sayfalar; günlük revalidate).
+- tsc/lint/build temiz; `/icon.svg`, `/robots.txt`, `/sitemap.xml` route'ları üretildi.
+
+---
+
 ### 2026-06-06 (2. iş) — Okuyucu akışı iyileştirmeleri II (canlı geri bildirim)
 
 Deploy sonrası canlı kullanımda çıkan 6 düzeltme/istek:

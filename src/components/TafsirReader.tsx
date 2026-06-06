@@ -501,22 +501,6 @@ export function TafsirReader({
               focusFind={focusFind}
               scrollToOffset={focusOffset}
             />
-            {(() => {
-              const idx = tafsirs.findIndex((t) => t.id === selectedId);
-              const isLastTafsir = idx === tafsirs.length - 1;
-              return (
-                <div className="mt-8 pt-5 border-t border-stone-200 dark:border-stone-800 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleSiradaki}
-                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-800 transition-colors"
-                  >
-                    {isLastTafsir ? "Sıradaki ayet" : "Sıradaki tefsir"}
-                    <span aria-hidden>→</span>
-                  </button>
-                </div>
-              );
-            })()}
           </>
         )}
         {!loading && showNotes && (
@@ -536,20 +520,36 @@ export function TafsirReader({
         )}
       </main>
 
-      {/* Sağ — vurgu/not araçları (sabit) */}
-      <aside className="md:sticky md:top-[calc(var(--ayah-sticky-h,140px)+12px)] md:self-start md:max-h-[calc(100vh-var(--ayah-sticky-h,140px)-28px)] md:overflow-y-auto">
-        <AnnotationTools
-          selection={activeSelection}
-          onHighlight={createHighlight}
-          onAddNote={startNoteFromSelection}
-          highlights={data?.highlights ?? []}
-          notes={data?.notes ?? []}
-          hiddenNoteIds={hiddenNoteIds}
-          onToggleNoteHidden={toggleNoteHidden}
-          onHighlightClick={deleteHighlight}
-          onHighlightJump={(id) => jumpToAnchor(`hl-${id}`)}
-          onNoteJump={(id) => jumpToAnchor(`note-${id}`)}
-        />
+      {/* Sağ — vurgu/not araçları (sabit) + sıradaki butonu (panelin altına sabit) */}
+      <aside className="md:sticky md:top-[calc(var(--ayah-sticky-h,140px)+12px)] md:self-start md:max-h-[calc(100vh-var(--ayah-sticky-h,140px)-28px)] md:flex md:flex-col md:min-h-0">
+        <div className="md:flex-1 md:overflow-y-auto md:min-h-0 md:pr-1">
+          <AnnotationTools
+            selection={activeSelection}
+            onHighlight={createHighlight}
+            onAddNote={startNoteFromSelection}
+            highlights={data?.highlights ?? []}
+            notes={data?.notes ?? []}
+            hiddenNoteIds={hiddenNoteIds}
+            onToggleNoteHidden={toggleNoteHidden}
+            onHighlightClick={deleteHighlight}
+            onHighlightJump={(id) => jumpToAnchor(`hl-${id}`)}
+            onNoteJump={(id) => jumpToAnchor(`note-${id}`)}
+          />
+        </div>
+        {!showNotes && selectedId != null && (
+          <div className="mt-3 shrink-0">
+            <button
+              type="button"
+              onClick={handleSiradaki}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-800 transition-colors"
+            >
+              {tafsirs.findIndex((t) => t.id === selectedId) === tafsirs.length - 1
+                ? "Sıradaki ayet"
+                : "Sıradaki tefsir"}
+              <span aria-hidden>→</span>
+            </button>
+          </div>
+        )}
       </aside>
 
       {/* Not modal'ları */}

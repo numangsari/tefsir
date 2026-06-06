@@ -6,8 +6,47 @@ import { Providers } from "@/components/Providers";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 
 export const metadata: Metadata = {
-  title: "Tefsir Projesi",
-  description: "Kur'an-ı Kerim ayet ayet tefsir okuyucu ve not defteri",
+  metadataBase: new URL("https://tefsir.net"),
+  title: {
+    default: "tefsir.net — Kur'an-ı Kerim tefsir okuyucu",
+    template: "%s · tefsir.net",
+  },
+  description:
+    "Kur'an-ı Kerim'i 11 klasik Türkçe tefsir üzerinden ayet ayet okuyun. Günümüz Türkçesine sadeleştirilmiş metin, vurgu ve not alma ile anlayarak okuma.",
+  applicationName: "tefsir.net",
+  keywords: [
+    "tefsir",
+    "Kur'an tefsiri",
+    "Kuran meali",
+    "Türkçe tefsir",
+    "ayet meali",
+    "sure tefsiri",
+    "Taberî tefsiri",
+    "Kurtubî tefsiri",
+    "Fahreddin Râzî",
+    "Kur'an oku",
+  ],
+  authors: [{ name: "tefsir.net" }],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "tefsir.net",
+    locale: "tr_TR",
+    url: "https://tefsir.net",
+    title: "tefsir.net — Kur'an-ı Kerim tefsir okuyucu",
+    description:
+      "11 klasik Türkçe tefsiri ayet ayet, sadeleştirilmiş ve anlaşılır biçimde okuyun.",
+  },
+  twitter: {
+    card: "summary",
+    title: "tefsir.net — Kur'an-ı Kerim tefsir okuyucu",
+    description: "11 klasik Türkçe tefsiri ayet ayet, sadeleştirilmiş biçimde okuyun.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,9 +1,47 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { OkuReaderShell } from "@/components/OkuReaderShell";
 
 type RouteParams = { surah: string; ayah: string };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<RouteParams>;
+}): Promise<Metadata> {
+  const { surah, ayah } = await params;
+  const sId = parseInt(surah);
+  const aNo = parseInt(ayah);
+  if (Number.isNaN(sId) || Number.isNaN(aNo)) return {};
+
+  const s = await prisma.surah.findUnique({
+    where: { id: sId },
+    select: { nameTr: true },
+  });
+  if (!s) return {};
+
+  const ayet = await prisma.ayah.findUnique({
+    where: { surahId_number: { surahId: sId, number: aNo } },
+    select: { meal: true },
+  });
+
+  const title = `${s.nameTr} Sûresi ${aNo}. ayet`;
+  const meal = ayet?.meal?.replace(/\s+/g, " ").trim();
+  const description = meal
+    ? `${title} meali ve 11 klasik Türkçe tefsiri. “${meal.slice(0, 150)}${
+        meal.length > 150 ? "…" : ""
+      }”`
+    : `${title} meali ve klasik Türkçe tefsirleri.`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/oku/${sId}/${aNo}` },
+    openGraph: { title: `${title} · tefsir.net`, description, type: "article" },
+  };
+}
 type SearchParams = {
   tafsir?: string;
   hl?: string;

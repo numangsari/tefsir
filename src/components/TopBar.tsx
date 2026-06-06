@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "./ThemeProvider";
+import { BrandLogo } from "./BrandLogo";
 
 export function TopBar({
   userName,
@@ -27,8 +28,8 @@ export function TopBar({
 
   return (
     <header className="bg-emerald-800 dark:bg-emerald-950 text-emerald-50 px-4 py-2 flex items-center justify-between text-sm gap-2">
-      <Link href="/oku" className="font-semibold italic tracking-wide whitespace-nowrap text-base">
-        tefsir.net
+      <Link href="/oku" aria-label="tefsir.net ana sayfa" className="whitespace-nowrap">
+        <BrandLogo />
       </Link>
 
       <div className="hidden lg:block text-center text-emerald-100/90 text-xs italic">
