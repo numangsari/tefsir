@@ -4,7 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { OkuReaderShell } from "@/components/OkuReaderShell";
 
 type RouteParams = { surah: string; ayah: string };
-type SearchParams = { tafsir?: string; hl?: string; note?: string; flash?: string; find?: string };
+type SearchParams = {
+  tafsir?: string;
+  hl?: string;
+  note?: string;
+  flash?: string;
+  find?: string;
+  pos?: string;
+};
 
 export default async function AyahPage({
   params,
@@ -20,6 +27,7 @@ export default async function AyahPage({
   const focusNote = sp.note ?? undefined;
   const flash = sp.flash ?? undefined;
   const focusFind = sp.find ? decodeURIComponent(sp.find) : undefined;
+  const focusOffset = sp.pos ? parseInt(sp.pos) : undefined;
   const sId = parseInt(surah);
   const aNo = parseInt(ayah);
   if (Number.isNaN(sId) || Number.isNaN(aNo)) notFound();
@@ -76,6 +84,7 @@ export default async function AyahPage({
           focusHighlightId={focusHighlight}
           focusNoteId={focusNote}
           focusFind={focusFind}
+          focusOffset={focusOffset}
           flash={flash}
         />
       </Suspense>

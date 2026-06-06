@@ -12,7 +12,8 @@ export function AnnotationTools({
   hiddenNoteIds,
   onToggleNoteHidden,
   onHighlightClick,
-  onNoteClick,
+  onHighlightJump,
+  onNoteJump,
 }: {
   selection: Selection | null;
   onHighlight: (color: string) => void;
@@ -22,7 +23,10 @@ export function AnnotationTools({
   hiddenNoteIds: Set<string>;
   onToggleNoteHidden: (id: string) => void;
   onHighlightClick: (id: string) => void;
-  onNoteClick: (n: Note) => void;
+  /** Listeden vurguya tıklayınca metinde o vurguya kaydır */
+  onHighlightJump: (id: string) => void;
+  /** Listeden nota tıklayınca metinde o nota kaydır */
+  onNoteJump: (id: string) => void;
 }) {
   return (
     <div className="space-y-3">
@@ -52,7 +56,7 @@ export function AnnotationTools({
         ) : (
           <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
             Metin seçince renk araçları burada açılır. Not eklemek için tefsirin herhangi bir yerine
-            tıklayın.
+            çift tıklayın.
           </p>
         )}
       </section>
@@ -72,9 +76,13 @@ export function AnnotationTools({
                 className="text-xs flex items-start gap-1.5 group"
               >
                 <span className="inline-block w-2.5 h-2.5 mt-1 rounded-sm shrink-0 bg-emerald-600" />
-                <span className="flex-1 italic text-stone-700 dark:text-stone-300 line-clamp-2">
+                <button
+                  onClick={() => onHighlightJump(h.id)}
+                  className="flex-1 text-left italic text-stone-700 dark:text-stone-300 line-clamp-2 hover:text-emerald-700 dark:hover:text-emerald-300 cursor-pointer"
+                  title="Metinde bu vurguya git"
+                >
                   &ldquo;{h.text}&rdquo;
-                </span>
+                </button>
                 <button
                   onClick={() => onHighlightClick(h.id)}
                   className="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-red-600 text-xs"
@@ -101,7 +109,8 @@ export function AnnotationTools({
               <li key={n.id}>
                 <div className="w-full text-left text-xs p-2 rounded border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-stone-900">
                   <button
-                    onClick={() => onNoteClick(n)}
+                    onClick={() => onNoteJump(n.id)}
+                    title="Metinde bu nota git"
                     className="w-full text-left hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded px-1 py-0.5"
                   >
                     <div className="text-emerald-700 dark:text-emerald-300">✎ Not</div>

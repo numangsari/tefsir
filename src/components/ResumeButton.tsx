@@ -3,10 +3,20 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { BOOKMARK_EVENT, fetchBookmark, type BookmarkData } from "@/lib/bookmark-events";
+import { getResumeScroll, resumeScrollKey } from "@/lib/tafsir-scroll";
 
 export function ResumeButton() {
   const [bm, setBm] = useState<BookmarkData | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [pos, setPos] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!bm) {
+      setPos(null);
+      return;
+    }
+    setPos(getResumeScroll(resumeScrollKey(bm.surahId, bm.ayahNo, bm.tafsirId)));
+  }, [bm]);
 
   const load = useCallback(async () => {
     const bookmark = await fetchBookmark();
@@ -30,9 +40,11 @@ export function ResumeButton() {
 
   if (!loaded || !bm) return null;
 
-  const href = `/oku/${bm.surahId}/${bm.ayahNo}${
-    bm.tafsirId ? `?tafsir=${bm.tafsirId}` : ""
-  }`;
+  const query = new URLSearchParams();
+  if (bm.tafsirId) query.set("tafsir", String(bm.tafsirId));
+  if (pos && pos > 0) query.set("pos", String(pos));
+  const qs = query.toString();
+  const href = `/oku/${bm.surahId}/${bm.ayahNo}${qs ? `?${qs}` : ""}`;
 
   return (
     <div className="mb-2 flex justify-end">

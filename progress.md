@@ -7,6 +7,20 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-06 (2. iş) — Okuyucu akışı iyileştirmeleri II (canlı geri bildirim)
+
+Deploy sonrası canlı kullanımda çıkan 6 düzeltme/istek:
+
+- **"Sıradaki" butonu okundu yapıyor**: Sıradakine geçerken mevcut tefsir (girişliyse) sessizce okundu işaretleniyor (`persistReadMark` + `handleSiradaki`; OKU butonu da aynı yardımcıyı kullanıyor).
+- **"Burada kaldım" konum hafızası**: Bookmark kaydedilirken okunan dikey konum (karakter offset'i) yakalanıp **localStorage**'a yazılıyor (`src/lib/tafsir-scroll.ts`); `ResumeButton` linke `?pos=` ekliyor; geri dönünce tefsir o konuma kaydırılıyor (`TafsirContentView.scrollToOffset`, bir kez, sonra `pos` URL'den temizleniyor). Not: konum cihaza özel (sunucuda bookmark dururken tam kaydırma localStorage'da; başka cihazda baştan açılır) — üretim DB'sine şema push'undan kaçınmak için bilinçli tercih.
+- **Süslü/Arapça parantezli ayet no temizliği**: `﴾ 6 ﴿`, `{6}` gibi işaretler de `cleanTafsirText`'e eklendi (işaretliyse her zaman, çıplak sayıysa yalnız ayet no'suna eşitse atılır).
+- **Sağ panelin üstten kesilmesi düzeltildi**: Sticky başlık yüksekliği `ResizeObserver` ile ölçülüp `--ayah-sticky-h` CSS değişkenine yazılıyor; yan paneller (vurgu/not + tefsir listesi) sticky `top`/`max-height` değerlerini buna bağladı.
+- **"çift tıklayın" metni**: Sağ paneldeki ipucu güncellendi (not ekleme zaten çift tıklamaya geçmişti).
+- **Vurgu/nota listeden tıklayınca git**: "Bu tefsirdeki vurgularım/notlarım" listesinde bir öğeye tıklayınca metinde o vurguya/nota kaydırılıp kısa vurgu efekti gösteriliyor (`jumpToAnchor` → `onHighlightJump`/`onNoteJump`).
+- tsc/lint temiz, `next build` compiled successfully.
+
+---
+
 ### 2026-06-06 — Okuyucu akışı iyileştirmeleri (gezinme, temizlik, UX)
 
 Okuma deneyimine yönelik 7 küçük iyileştirme yapıldı:

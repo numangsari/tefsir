@@ -9,6 +9,12 @@ import {
   fetchBookmark,
   type BookmarkData,
 } from "@/lib/bookmark-events";
+import {
+  captureTafsirScrollOffset,
+  clearResumeScroll,
+  resumeScrollKey,
+  saveResumeScroll,
+} from "@/lib/tafsir-scroll";
 
 function matchesCurrent(
   bookmark: BookmarkData,
@@ -82,6 +88,7 @@ export function BookmarkButton({
       if (isHere) {
         const r = await fetch("/api/my/bookmark", { method: "DELETE" });
         if (r.ok) {
+          clearResumeScroll(resumeScrollKey(surahId, ayahNo, tafsirId));
           setIsHere(false);
           setSavedAt(null);
           emitBookmarkChange(null);
@@ -90,12 +97,15 @@ export function BookmarkButton({
           toast.error("İşaret kaldırılamadı.");
         }
       } else {
+        // Okunan yerin dikey konumunu yakala (geri dönünce aynı yere açılsın)
+        const offset = captureTafsirScrollOffset();
         const r = await fetch("/api/my/bookmark", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ surahId, ayahNo, tafsirId }),
         });
         if (r.ok) {
+          saveResumeScroll(resumeScrollKey(surahId, ayahNo, tafsirId), offset);
           const bookmark = await fetchBookmark();
           if (bookmark) {
             setIsHere(true);

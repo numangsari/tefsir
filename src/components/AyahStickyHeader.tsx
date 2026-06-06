@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { AyahSelector } from "@/components/AyahSelector";
 import { AyahWordBridge } from "@/components/AyahWordBridge";
@@ -40,6 +40,7 @@ export function AyahStickyHeader({
 }) {
   const [compact, setCompact] = useState(false);
   const [flashRing, setFlashRing] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -51,6 +52,26 @@ export function AyahStickyHeader({
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Sticky başlık yüksekliğini ölç → yan panellerin (vurgu/not, tefsir listesi)
+  // sticky `top` ve `max-height` değerleri buna göre ayarlanır (üstte kesilmesin).
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const update = () =>
+      document.documentElement.style.setProperty(
+        "--ayah-sticky-h",
+        `${Math.round(el.offsetHeight)}px`
+      );
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   useEffect(() => {
@@ -74,6 +95,7 @@ export function AyahStickyHeader({
   return (
     <div
       id="ayah-sticky-header"
+      ref={headerRef}
       className={`sticky top-0 z-10 -mx-4 px-4 bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur border-b border-stone-200 dark:border-stone-800 transition-all ${
         compact ? "py-2" : "py-3"
       } ${flashRing && flash === "ayah" ? "ring-2 ring-amber-500 ring-inset" : ""}`}

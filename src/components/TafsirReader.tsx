@@ -11,6 +11,7 @@ import { NotesPanel } from "./NotesPanel";
 import { AnnotationTools } from "./AnnotationTools";
 import { useToast } from "./Toaster";
 import { useRequireAuth } from "@/lib/use-require-auth";
+import { useSession } from "next-auth/react";
 import { setPreferredTafsirId } from "@/lib/preferred-tafsir";
 
 export type TafsirSummary = {
@@ -54,6 +55,7 @@ export function TafsirReader({
   focusHighlightId,
   focusNoteId,
   focusFind,
+  focusOffset,
   flash,
 }: {
   surahId: number;
@@ -70,10 +72,13 @@ export function TafsirReader({
   focusHighlightId?: string;
   focusNoteId?: string;
   focusFind?: string;
+  /** "Burada kaldım" geri dönüşünde metinde kaydırılacak karakter offset'i */
+  focusOffset?: number;
   flash?: string;
 }) {
   const toast = useToast();
   const requireAuth = useRequireAuth();
+  const { status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -293,26 +298,55 @@ export function TafsirReader({
     }
   }
 
-  async function toggleReadMark(tafsirId: number) {
-    if (!requireAuth()) return;
-    const marked = readTafsirIds.has(tafsirId);
+  async function persistReadMark(tafsirId: number, value: boolean) {
     const r = await fetch("/api/my/tafsir-reads", {
-      method: marked ? "DELETE" : "POST",
+      method: value ? "POST" : "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ surahId, ayahNo, tafsirId }),
     });
     if (r.ok) {
       setReadTafsirIds((prev) => {
         const next = new Set(prev);
-        if (marked) next.delete(tafsirId);
-        else next.add(tafsirId);
+        if (value) next.add(tafsirId);
+        else next.delete(tafsirId);
         return next;
       });
-      // Yeni okundu işaretlendiyse sıradaki tefsire (son tefsirse sıradaki ayete) geç
-      if (!marked) onAdvance(tafsirId);
-    } else {
-      toast.error("Okundu işareti kaydedilemedi.");
+      return true;
     }
+    toast.error("Okundu işareti kaydedilemedi.");
+    return false;
+  }
+
+  // OKU butonu: işaretle/kaldır; yeni okundu işaretlendiyse sıradakine geç
+  async function toggleReadMark(tafsirId: number) {
+    if (!requireAuth()) return;
+    const marked = readTafsirIds.has(tafsirId);
+    const ok = await persistReadMark(tafsirId, !marked);
+    if (ok && !marked) onAdvance(tafsirId);
+  }
+
+  // "Sıradaki" butonu: mevcut tefsiri (girişliyse) sessizce okundu yapıp ilerle
+  async function handleSiradaki() {
+    if (
+      selectedId != null &&
+      status === "authenticated" &&
+      !readTafsirIds.has(selectedId)
+    ) {
+      await persistReadMark(selectedId, true);
+    }
+    onAdvance(selectedId);
+  }
+
+  // Listeden vurgu/nota tıklanınca metinde o öğeye kaydır + kısa vurgu efekti
+  function jumpToAnchor(domId: string) {
+    const el = document.getElementById(domId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.add("ring-2", "ring-amber-500", "rounded-sm");
+    window.setTimeout(
+      () => el.classList.remove("ring-2", "ring-amber-500", "rounded-sm"),
+      2000
+    );
   }
 
   function toggleNoteHidden(noteId: string) {
@@ -336,7 +370,7 @@ export function TafsirReader({
   return (
     <div className="mt-4 grid grid-cols-1 md:grid-cols-[230px_1fr_300px] gap-4">
       {/* Sol panel — bağımsız scroll */}
-      <aside className="md:sticky md:top-[130px] md:self-start md:max-h-[calc(100vh-150px)] md:overflow-y-auto pr-1">
+      <aside className="md:sticky md:top-[calc(var(--ayah-sticky-h,140px)+12px)] md:self-start md:max-h-[calc(100vh-var(--ayah-sticky-h,140px)-28px)] md:overflow-y-auto pr-1">
         <ul className="space-y-1">
           {tafsirs.map((t) => {
             const isRead = readTafsirIds.has(t.id);
@@ -465,6 +499,7 @@ export function TafsirReader({
               focusHighlightId={focusHighlightId}
               focusNoteId={focusNoteId}
               focusFind={focusFind}
+              scrollToOffset={focusOffset}
             />
             {(() => {
               const idx = tafsirs.findIndex((t) => t.id === selectedId);
@@ -473,7 +508,7 @@ export function TafsirReader({
                 <div className="mt-8 pt-5 border-t border-stone-200 dark:border-stone-800 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => onAdvance(selectedId)}
+                    onClick={handleSiradaki}
                     className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-800 transition-colors"
                   >
                     {isLastTafsir ? "Sıradaki ayet" : "Sıradaki tefsir"}
@@ -502,7 +537,7 @@ export function TafsirReader({
       </main>
 
       {/* Sağ — vurgu/not araçları (sabit) */}
-      <aside className="md:sticky md:top-[130px] md:self-start md:max-h-[calc(100vh-150px)] md:overflow-y-auto">
+      <aside className="md:sticky md:top-[calc(var(--ayah-sticky-h,140px)+12px)] md:self-start md:max-h-[calc(100vh-var(--ayah-sticky-h,140px)-28px)] md:overflow-y-auto">
         <AnnotationTools
           selection={activeSelection}
           onHighlight={createHighlight}
@@ -512,7 +547,8 @@ export function TafsirReader({
           hiddenNoteIds={hiddenNoteIds}
           onToggleNoteHidden={toggleNoteHidden}
           onHighlightClick={deleteHighlight}
-          onNoteClick={(n) => setEditingNote(n)}
+          onHighlightJump={(id) => jumpToAnchor(`hl-${id}`)}
+          onNoteJump={(id) => jumpToAnchor(`note-${id}`)}
         />
       </aside>
 

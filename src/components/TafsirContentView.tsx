@@ -192,6 +192,7 @@ export function TafsirContentView({
   focusHighlightId,
   focusNoteId,
   focusFind,
+  scrollToOffset,
 }: {
   surahId: number;
   ayahNo: number;
@@ -209,10 +210,13 @@ export function TafsirContentView({
   focusHighlightId?: string;
   focusNoteId?: string;
   focusFind?: string;
+  /** "Burada kaldım" geri dönüşünde kaydırılacak karakter offset'i */
+  scrollToOffset?: number;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const focusTriggeredRef = useRef(false);
   const findTriggeredRef = useRef(false);
+  const offsetScrolledRef = useRef(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -300,6 +304,45 @@ export function TafsirContentView({
     }, 350);
     return () => window.clearTimeout(t);
   }, [focusFind, segments, pathname, router, searchParams]);
+
+  // "Burada kaldım" geri dönüşü: kaydedilen karakter offset'ine kaydır (bir kez)
+  useEffect(() => {
+    if (offsetScrolledRef.current) return;
+    if (scrollToOffset == null || scrollToOffset <= 0) return;
+    const t = window.setTimeout(() => {
+      const root = containerRef.current;
+      if (!root) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let total = 0;
+      let target: { node: Text; off: number } | null = null;
+      while (walker.nextNode()) {
+        const n = walker.currentNode as Text;
+        const len = n.data.length;
+        if (total + len >= scrollToOffset) {
+          target = { node: n, off: Math.max(0, Math.min(scrollToOffset - total, len)) };
+          break;
+        }
+        total += len;
+      }
+      if (!target || target.node.data.length === 0) return;
+      const range = document.createRange();
+      range.setStart(target.node, target.off);
+      range.setEnd(target.node, Math.min(target.off + 1, target.node.data.length));
+      const rect = range.getBoundingClientRect();
+      const headerH =
+        parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue("--ayah-sticky-h")
+        ) || 150;
+      const top = window.scrollY + rect.top - headerH - 16;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      offsetScrolledRef.current = true;
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("pos");
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [scrollToOffset, segments, pathname, router, searchParams]);
 
   // Metne çift tıkla → not ekle (tek tıkla kazara not açılmasını önler)
   function handleAddNote(e: React.MouseEvent<HTMLDivElement>) {

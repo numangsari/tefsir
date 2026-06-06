@@ -29,6 +29,7 @@ export function OkuReaderShell({
   focusHighlightId,
   focusNoteId,
   focusFind,
+  focusOffset,
   flash,
 }: {
   surahMeta: SurahMeta;
@@ -43,6 +44,7 @@ export function OkuReaderShell({
   focusHighlightId?: string;
   focusNoteId?: string;
   focusFind?: string;
+  focusOffset?: number;
   flash?: string;
 }) {
   const router = useRouter();
@@ -112,6 +114,7 @@ export function OkuReaderShell({
         focusHighlightId={focusHighlightId}
         focusNoteId={focusNoteId}
         focusFind={focusFind}
+        focusOffset={focusOffset}
         flash={flash}
       />
       <ScrollToTopButton />
