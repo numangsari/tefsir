@@ -8,11 +8,20 @@ export function ScrollToTopButton() {
 
   useEffect(() => {
     function onScroll() {
-      setVisible(window.scrollY > 400);
+      const y = window.scrollY;
+      // Sayfanın en altına yaklaşınca gizle (alttaki önceki/sonraki ayet
+      // gezinmesiyle çakışmasın); biraz yukarı kaydırınca tekrar belirir.
+      const nearBottom =
+        window.innerHeight + y >= document.documentElement.scrollHeight - 140;
+      setVisible(y > 400 && !nearBottom);
     }
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   if (!visible) return null;
