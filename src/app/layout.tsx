@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -54,6 +54,12 @@ export const metadata: Metadata = {
       process.env.GOOGLE_SITE_VERIFICATION ??
       "HVa1PXwwAujvd2xa4bixm3niFnGCge3Evs_OEKZ75ww",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#065f46", // emerald-800 (üst çubukla uyumlu)
 };
 
 const siteJsonLd = [

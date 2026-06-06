@@ -183,9 +183,11 @@ export function AyahStickyHeader({
         </div>
       </div>
 
-      {/* Arapça + meal */}
+      {/* Arapça + meal — kaydırınca (compact) mobilde gizlenir, okuma alanı açılır */}
       <div
-        className={flashRing && flash === "meal" ? "ring-2 ring-amber-500 rounded-lg p-1" : ""}
+        className={`${compact ? "hidden md:block" : ""} ${
+          flashRing && flash === "meal" ? "ring-2 ring-amber-500 rounded-lg p-1" : ""
+        }`}
       >
         <AyahWordBridge
           surahId={surahMeta.id}

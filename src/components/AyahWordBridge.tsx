@@ -27,6 +27,17 @@ export function AyahWordBridge({
   const [words, setWords] = useState<WordItem[] | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
+  // Dokunmatik: bir kelimenin dışına dokununca açık tooltip'i kapat (hover'da onMouseLeave hallediyor)
+  useEffect(() => {
+    if (activeIndex == null) return;
+    function onPointerDown(e: PointerEvent) {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest("[data-word-index]")) setActiveIndex(null);
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [activeIndex]);
+
   useEffect(() => {
     let cancelled = false;
 

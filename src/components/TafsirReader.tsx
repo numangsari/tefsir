@@ -96,6 +96,8 @@ export function TafsirReader({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hiddenNoteIds, setHiddenNoteIds] = useState<Set<string>>(new Set());
+  // Mobil sekmeli düzen: aynı anda yalnız bir bölme görünür (masaüstünde üçü de grid'te).
+  const [mobilePane, setMobilePane] = useState<"list" | "text" | "tools">("text");
 
   // Aktif text seçimi (sağ paneldeki araçlar bunu kullanır)
   const [activeSelection, setActiveSelection] = useState<Selection | null>(null);
@@ -391,9 +393,13 @@ export function TafsirReader({
   }
 
   return (
-    <div className="mt-4 grid grid-cols-1 md:grid-cols-[230px_1fr_300px] gap-4">
+    <div className="mt-4 md:grid md:grid-cols-[230px_1fr_300px] gap-4 pb-20 md:pb-0">
       {/* Sol panel — bağımsız scroll */}
-      <aside className="md:sticky md:top-[calc(var(--ayah-sticky-h,140px)+12px)] md:self-start md:max-h-[calc(100vh-var(--ayah-sticky-h,140px)-28px)] md:overflow-y-auto pr-1">
+      <aside
+        className={`${
+          mobilePane === "list" ? "block" : "hidden"
+        } md:block md:sticky md:top-[calc(var(--ayah-sticky-h,140px)+12px)] md:self-start md:max-h-[calc(100vh-var(--ayah-sticky-h,140px)-28px)] md:overflow-y-auto pr-1`}
+      >
         <ul className="space-y-1">
           {tafsirs.map((t) => {
             const isRead = readTafsirIds.has(t.id);
@@ -415,6 +421,7 @@ export function TafsirReader({
                     onShowNotesChange(false);
                     setPreferredTafsirId(t.id);
                     onSelectedIdChange(t.id);
+                    setMobilePane("text");
                   }}
                   className="w-full text-left px-3 py-2.5 pr-12"
                 >
@@ -452,7 +459,7 @@ export function TafsirReader({
                   title={isRead ? "Okundu işaretini kaldır" : "Okudum olarak işaretle"}
                   aria-label={isRead ? "Okundu" : "Okudum"}
                   aria-pressed={isRead}
-                  className={`absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center w-8 h-8 rounded-full border-2 transition-all ${
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center w-9 h-9 md:w-8 md:h-8 rounded-full border-2 transition-all ${
                     isRead
                       ? "bg-emerald-600 border-emerald-600 text-white shadow-sm scale-100"
                       : isSelected
@@ -483,7 +490,9 @@ export function TafsirReader({
 
       {/* Orta — tefsir gövdesi */}
       <main
-        className={`bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-md p-6 min-h-[60vh] transition-shadow ${
+        className={`${
+          mobilePane === "text" ? "block" : "hidden"
+        } md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-md p-4 sm:p-6 min-h-[60vh] transition-shadow ${
           flashTafsirRing ? "ring-2 ring-amber-500" : ""
         }`}
       >
@@ -543,10 +552,29 @@ export function TafsirReader({
             }}
           />
         )}
+        {/* Mobil: "Sıradaki" metin bölmesinin altında (sağ panel masaüstüne özel) */}
+        {!showNotes && selectedId != null && (
+          <div className="mt-6 md:hidden">
+            <button
+              type="button"
+              onClick={handleSiradaki}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-700 px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-emerald-800 transition-colors"
+            >
+              {tafsirs.findIndex((t) => t.id === selectedId) === tafsirs.length - 1
+                ? "Sıradaki ayet"
+                : "Sıradaki tefsir"}
+              <span aria-hidden>→</span>
+            </button>
+          </div>
+        )}
       </main>
 
       {/* Sağ — vurgu/not araçları (sabit) + sıradaki butonu (panelin altına sabit) */}
-      <aside className="md:sticky md:top-[calc(var(--ayah-sticky-h,140px)+12px)] md:self-start md:max-h-[calc(100vh-var(--ayah-sticky-h,140px)-28px)] md:flex md:flex-col md:min-h-0">
+      <aside
+        className={`${
+          mobilePane === "tools" ? "block" : "hidden"
+        } md:block md:sticky md:top-[calc(var(--ayah-sticky-h,140px)+12px)] md:self-start md:max-h-[calc(100vh-var(--ayah-sticky-h,140px)-28px)] md:flex md:flex-col md:min-h-0`}
+      >
         <div className="md:flex-1 md:overflow-y-auto md:min-h-0 md:pr-1">
           <AnnotationTools
             selection={activeSelection}
@@ -562,7 +590,7 @@ export function TafsirReader({
           />
         </div>
         {!showNotes && selectedId != null && (
-          <div className="mt-3 shrink-0">
+          <div className="mt-3 shrink-0 hidden md:block">
             <button
               type="button"
               onClick={handleSiradaki}
@@ -607,6 +635,47 @@ export function TafsirReader({
           onToggleHidden={() => toggleNoteHidden(editingNote.id)}
         />
       )}
+
+      {/* Mobil alt sekme çubuğu — Tefsirler / Metin / Araçlar */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-20 flex border-t border-stone-200 dark:border-stone-800 bg-white/95 dark:bg-stone-950/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
+        {(
+          [
+            { key: "list", label: "Tefsirler", icon: "☰" },
+            { key: "text", label: "Metin", icon: "📖" },
+            { key: "tools", label: "Araçlar", icon: "✎" },
+          ] as { key: "list" | "text" | "tools"; label: string; icon: string }[]
+        ).map((t) => {
+          const active = mobilePane === t.key;
+          const toolsCount =
+            (data?.highlights.length ?? 0) + (data?.notes.length ?? 0);
+          return (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setMobilePane(t.key)}
+              aria-current={active ? "page" : undefined}
+              className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium transition-colors ${
+                active
+                  ? "text-emerald-700 dark:text-emerald-300"
+                  : "text-stone-500 dark:text-stone-400"
+              }`}
+            >
+              <span className="text-base leading-none" aria-hidden>
+                {t.icon}
+              </span>
+              {t.label}
+              {t.key === "tools" && toolsCount > 0 && (
+                <span className="absolute top-1 right-1/2 translate-x-4 min-w-[16px] h-4 px-1 rounded-full bg-emerald-600 text-white text-[10px] leading-4 text-center">
+                  {toolsCount}
+                </span>
+              )}
+              {active && (
+                <span className="absolute top-0 inset-x-4 h-0.5 rounded-full bg-emerald-600" />
+              )}
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }

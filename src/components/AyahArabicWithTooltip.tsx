@@ -36,7 +36,9 @@ export function AyahArabicWithTooltip({
             key={`${w.index}-${w.arabic}`}
             data-word-index={w.index}
             onMouseEnter={() => onHoverIndex?.(w.index)}
-            className={`relative inline-block mx-[2px] px-0.5 rounded transition-colors cursor-default ${
+            // Dokunmatik: hover yok → dokununca aç/kapat (aynı kelimeye tekrar dokununca kapanır)
+            onClick={() => onHoverIndex?.(active ? null : w.index)}
+            className={`relative inline-block mx-[2px] px-0.5 rounded transition-colors cursor-pointer ${
               active
                 ? "bg-emerald-200 dark:bg-emerald-800/70 text-emerald-950 dark:text-emerald-50 ring-1 ring-emerald-500"
                 : "hover:bg-emerald-100/80 dark:hover:bg-emerald-900/40"

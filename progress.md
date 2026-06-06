@@ -7,6 +7,23 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-06 (7. iş) — Mobil uyumluluk
+
+Kullanıcı sitenin mobil için uyumlu hale getirilmesini, önce tam analiz yapılmasını istedi. Tüm sayfalar incelendi; asıl sorun **okuyucu sayfasıydı** (`/oku`): masaüstünde 3 sütunlu grid (tefsir listesi · metin · not/vurgu araçları) mobilde alt alta diziliyor, kullanıcı metne ulaşmak için 11 tefsir kartını kaydırmak zorunda kalıyor, "Sıradaki" butonu sayfanın en altında erişilemez oluyordu. Ayrıca Arapça kelime tooltip'i sadece hover ile açıldığından dokunmatik cihazlarda hiç çalışmıyordu.
+
+**Onaylanan tasarım:** mobil okuyucu = alt sekme çubuğu (Tefsirler · Metin · Araçlar), varsayılan Metin açık. Masaüstü düzeni aynen korundu.
+
+**Uygulananlar:**
+1. **Okuyucu mobil sekmeli düzen** (`TafsirReader.tsx`): `mobilePane` state; kök grid mobilde tek sütun (`md:grid`), her bölme `hidden/block` + `md:block`; alta sabit sekme çubuğu (Araçlar'da vurgu+not rozeti); tefsir seçilince otomatik Metin sekmesine geçiş; "Sıradaki" mobilde metin altında (masaüstü kopyası `hidden md:block`); OKU yuvarlağı mobilde büyütüldü.
+2. **Arapça tooltip dokunmatik** (`AyahArabicWithTooltip` + `AyahWordBridge`): kelimeye dokununca aç/kapat (toggle), dışarı dokununca kapanır; hover masaüstünde korunuyor.
+3. **Sticky başlık mobilde kompakt** (`AyahStickyHeader`): kaydırınca Arapça+meal mobilde gizlenip okuma alanı açılıyor.
+4. **viewport export** (`layout.tsx`): device-width + tema rengi `#065f46`.
+5. **"En üste çık" butonu** (`ScrollToTopButton`): mobilde sekme çubuğunun üstüne kaldırıldı (çakışma giderildi).
+
+Diğer sayfalar (profil/panel/arama/sûreler/giriş) zaten `flex-wrap`/responsive grid kullandığından dokunulmadı; yönetici tabloları `overflow-x-auto` ile (admin-only) yeterli kabul edildi. tsc/lint/build temiz; dev sunucuda `/oku/2/6` SSR çıktısı curl ile doğrulandı (sekme çubuğu, çift "Sıradaki", theme-color, viewport, pb-20 hepsi render ediliyor). Gerçek dokunmatik akış deploy sonrası telefonda test edilmeli.
+
+⚠️ Not: dev'i `env -u DATABASE_URL -u DIRECT_URL npm run dev` ile çalıştır — shell'deki `file:./dev.db` Prisma'yı 500 yapıyor.
+
 ### 2026-06-06 (6. iş) — Performans: bölge + sorgu paralelleştirme + tefsir SSR seed
 
 Kullanıcı sitenin genel hızlanmasını (tefsir açma + arama sonuçları) istedi. Tahmin yerine önce ölçüm yapıldı (`scripts/perf-measure.ts` — sadece okur: row count + EXPLAIN ANALYZE + sorgu timing).
