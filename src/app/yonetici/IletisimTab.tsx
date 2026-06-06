@@ -21,6 +21,9 @@ export function IletisimTab() {
   const [unread, setUnread] = useState(0);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  const [replyFor, setReplyFor] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [sending, setSending] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -50,6 +53,41 @@ export function IletisimTab() {
       setUnread((u) => Math.max(0, u + (read ? -1 : 1)));
     } else {
       toast.error("İşlem başarısız.");
+    }
+  }
+
+  function openReply(m: ContactMessage) {
+    if (replyFor === m.id) {
+      setReplyFor(null);
+      return;
+    }
+    setReplyFor(m.id);
+    setReplyText("");
+  }
+
+  async function sendReply(m: ContactMessage) {
+    if (!replyText.trim()) {
+      toast.error("Yanıt metni boş olamaz.");
+      return;
+    }
+    setSending(true);
+    const res = await fetch("/api/admin/contact/reply", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: m.id, body: replyText }),
+    });
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    setSending(false);
+    if (res.ok) {
+      toast.success(`Yanıt ${m.email} adresine gönderildi.`);
+      if (!m.readAt) setUnread((u) => Math.max(0, u - 1));
+      setMessages((xs) =>
+        xs.map((x) => (x.id === m.id ? { ...x, readAt: x.readAt ?? new Date().toISOString() } : x))
+      );
+      setReplyFor(null);
+      setReplyText("");
+    } else {
+      toast.error(data.error || "Yanıt gönderilemedi.");
     }
   }
 
@@ -133,14 +171,12 @@ export function IletisimTab() {
                       >
                         {isUnread ? "Okundu işaretle" : "Okunmadı işaretle"}
                       </button>
-                      <a
-                        href={`mailto:${m.email}?subject=${encodeURIComponent(
-                          m.subject ? `Re: ${m.subject}` : "tefsir.net mesajınız hakkında"
-                        )}`}
+                      <button
+                        onClick={() => openReply(m)}
                         className="text-stone-500 dark:text-stone-400 hover:underline"
                       >
-                        Yanıtla
-                      </a>
+                        {replyFor === m.id ? "Yanıtı kapat" : "Yanıtla"}
+                      </button>
                       <button
                         onClick={() => remove(m)}
                         disabled={busy === m.id}
@@ -149,6 +185,40 @@ export function IletisimTab() {
                         Sil
                       </button>
                     </div>
+
+                    {replyFor === m.id && (
+                      <div className="mt-3 rounded-md border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950/60 p-3">
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mb-2">
+                          Yanıt <span className="font-medium">{m.email}</span> adresine{" "}
+                          <span className="font-medium">tefsir.net</span> adına gönderilecek.
+                        </p>
+                        <textarea
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          maxLength={5000}
+                          rows={4}
+                          autoFocus
+                          placeholder="Yanıtınızı yazın…"
+                          className="w-full rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2 text-sm text-stone-800 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 resize-y"
+                        />
+                        <div className="mt-2 flex items-center gap-2">
+                          <button
+                            onClick={() => sendReply(m)}
+                            disabled={sending}
+                            className="px-3 py-1.5 text-xs rounded-md bg-emerald-700 text-white hover:bg-emerald-600 disabled:opacity-60"
+                          >
+                            {sending ? "Gönderiliyor…" : "Gönder"}
+                          </button>
+                          <button
+                            onClick={() => setReplyFor(null)}
+                            disabled={sending}
+                            className="px-3 py-1.5 text-xs rounded-md border border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-300 disabled:opacity-60"
+                          >
+                            İptal
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </li>

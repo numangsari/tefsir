@@ -7,6 +7,12 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-06 (8. iş, ek) — İletişim yanıtı site adına gönderiliyor
+
+Kullanıcı fark etti: panelden "Yanıtla" deyince cevap kendi şahsi Gmail'inden gidiyor (çünkü buton sadece `mailto:` linkiydi, Mac Mail uygulamasını açıyordu). Beklenen: yanıt tefsir.net adından gitsin.
+
+**Uygulananlar:** (1) `email.ts` → `sendContactReply` + `contactReplyTemplate` (Resend; `from: noreply@tefsir.net`, `to: ziyaretçi`, `replyTo: CONTACT_EMAIL`||numangsari@gmail.com; e-posta gövdesinde admin yanıtı + altında alıntılı orijinal mesaj). (2) `POST /api/admin/contact/reply` (ADMIN; doğrulama, Resend gönderim, başarıda mesajı okundu işaretle + `recordAudit('contact.reply')`). (3) `IletisimTab.tsx`: "Yanıtla" artık satır içi yanıt kutusu açıyor (mailto kaldırıldı); gönderince toast + okundu güncelle. (4) Denetim sekmesine "Mesaj yanıtlandı" etiketi. **Yeni DB kolonu yok** (mevcut ContactMessage), deploy ile doğrudan çalışır. tsc/build temiz.
+
 ### 2026-06-06 (8. iş) — Ana sayfa (tanıtım) + İletişim sayfası
 
 Kullanıcı iki yeni sayfa istedi: (1) sitenin genel tanıtımı olan, tefsir okuma/arama/notlar/hesabım'a yönlendiren bir **ana sayfa**; (2) kullanıcıların mesaj gönderebileceği bir **iletişim sayfası**.

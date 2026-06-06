@@ -59,6 +59,64 @@ export async function sendContactNotification(params: {
   });
 }
 
+// Yönetici panelinden ziyaretçiye yanıt gönderir. Site adına (noreply@tefsir.net)
+// gider; ziyaretçi yanıtlarsa CONTACT_EMAIL'e (varsa) ulaşsın diye replyTo eklenir.
+export async function sendContactReply(params: {
+  to: string;
+  subject?: string | null;
+  replyBody: string;
+  originalBody: string;
+}) {
+  const replyTo = process.env.CONTACT_EMAIL ?? "numangsari@gmail.com";
+  const subjectLine = params.subject?.trim()
+    ? `Re: ${params.subject.trim()}`
+    : "tefsir.net — mesajınıza yanıt";
+  await getResend().emails.send({
+    from: FROM,
+    to: params.to,
+    replyTo,
+    subject: subjectLine,
+    html: contactReplyTemplate(params),
+  });
+}
+
+function contactReplyTemplate({
+  replyBody,
+  originalBody,
+}: {
+  replyBody: string;
+  originalBody: string;
+}) {
+  return `<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f0;font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f0;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e5e5e0;">
+        <tr><td style="background:#15803d;padding:24px 32px;">
+          <span style="color:#fff;font-size:22px;font-weight:600;letter-spacing:-0.5px;">tefsir.net</span>
+        </td></tr>
+        <tr><td style="padding:32px;">
+          <p style="margin:0 0 8px;font-size:13px;color:#78716c;">tefsir.net ekibinden mesajınıza yanıt:</p>
+          <div style="padding:16px;background:#fafaf9;border:1px solid #e5e5e0;border-radius:6px;font-size:15px;line-height:1.6;color:#1c1917;white-space:pre-wrap;">${esc(
+            replyBody
+          )}</div>
+          <p style="margin:24px 0 6px;font-size:12px;color:#a8a29e;">— Gönderdiğiniz orijinal mesaj —</p>
+          <div style="padding:12px;border-left:3px solid #e5e5e0;font-size:13px;line-height:1.5;color:#78716c;white-space:pre-wrap;">${esc(
+            originalBody
+          )}</div>
+        </td></tr>
+        <tr><td style="padding:16px 32px;border-top:1px solid #e5e5e0;background:#fafaf9;">
+          <p style="margin:0;font-size:12px;color:#a8a29e;">Bu e-posta tefsir.net tarafından gönderilmiştir. Yanıt verebilirsiniz.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
 // HTML enjeksiyonunu önlemek için kullanıcı girdisini kaçışla (e-posta gövdesinde).
 function esc(s: string): string {
   return s

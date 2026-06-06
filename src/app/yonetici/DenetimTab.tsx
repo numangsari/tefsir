@@ -13,6 +13,7 @@ const ACTION_META: Record<string, { label: string; icon: string; cls: string }> 
   "user.hard_delete": { label: "Kalıcı silindi", icon: "⚠", cls: "text-red-700 dark:text-red-300" },
   "contact.read": { label: "Mesaj okundu", icon: "✉", cls: "text-emerald-700 dark:text-emerald-300" },
   "contact.unread": { label: "Mesaj okunmadı", icon: "✉", cls: "text-amber-700 dark:text-amber-300" },
+  "contact.reply": { label: "Mesaj yanıtlandı", icon: "↩", cls: "text-emerald-700 dark:text-emerald-300" },
   "contact.delete": { label: "Mesaj silindi", icon: "🗑", cls: "text-red-700 dark:text-red-300" },
 };
 
