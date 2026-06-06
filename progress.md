@@ -22,7 +22,7 @@ Kullanıcı iki yeni sayfa istedi: (1) sitenin genel tanıtımı olan, tefsir ok
 6. **Yönetici "İletişim" sekmesi** (panel artık 6 sekme): `IletisimTab.tsx` (okunmamış rozeti, okundu/okunmadı toggle, mailto yanıtla, sil), `api/admin/contact` (GET/PATCH/DELETE, ADMIN korumalı, `recordAudit`'e contact.read/unread/delete eklendi). `email.ts`'e `sendContactNotification` + HTML-escape'li `contactTemplate`.
 7. **SEO/env**: `sitemap.ts`'e `/iletisim`; `.env.example`'a `CONTACT_EMAIL` notu.
 
-tsc/lint/build temiz (lint'te yalnız önceden var olan font uyarısı). **⚠️ KALAN: `ContactMessage` tablosu production Neon'a henüz push EDİLMEDİ** — güvenlik sınıflandırıcısı prod DB push'unu engelledi, kullanıcı onayı bekliyor. Kullanıcı şunu çalıştırmalı: `env -u DATABASE_URL -u DIRECT_URL npx prisma db push`. Push yapılmadan iletişim formu DB'ye yazamaz (500). Push sonrası dev'de uçtan uca test (form gönder → panelde gör) yapılmalı.
+tsc/lint/build temiz (lint'te yalnız önceden var olan font uyarısı). Commit+push edildi. `ContactMessage` tablosu production Neon'a push edildi (kullanıcı `env -u … npx prisma db push` çalıştırdı) ve **canlıda uçtan uca doğrulandı**: `tefsir.net/iletisim`'den test mesajı gönderildi, yönetici → İletişim sekmesinde üye rozeti + okunmamış durumuyla göründü.
 
 ### 2026-06-06 (7. iş) — Mobil uyumluluk
 
