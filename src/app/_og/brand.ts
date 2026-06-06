@@ -1,26 +1,52 @@
 // OG (paylaşım) görselleri için ortak font yükleyici + marka işareti.
-// `_og` özel klasördür (route değil); birden çok opengraph-image route'u buradan
-// import eder. import.meta.url bu dosyaya göre çözüldüğünden font yolları sabit.
+// `_og` özel klasördür (route değil); birden çok opengraph-image route'u import eder.
+//
+// ÖNEMLİ: Font yerel dosyadan OKUNMAZ. Build `--turbopack` ile yapıldığında
+// `new URL(..., import.meta.url)` + readFileSync kalıbı serverless pakete dahil
+// EDİLMİYOR (file tracing başarısız) → Vercel'de modül yüklenirken hata fırlatıp
+// onu paylaşan tüm fonksiyonları (sayfaları) çökertiyordu. Bu yüzden font
+// çalışma anında CDN'den lazy + hataya dayanıklı biçimde alınır; alınamazsa
+// varsayılan fontla devam edilir (route asla patlamaz).
 
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+type OgFont = {
+  name: string;
+  data: ArrayBuffer;
+  weight: 400 | 700;
+  style: "normal";
+};
 
-// Node fetch `file:` protokolünü desteklemediğinden fontu fs ile okuyoruz.
-// `new URL(<literal>, import.meta.url)` kalıbı Next'in dosyayı sunucu
-// paketine dahil etmesini (file tracing) sağlar.
-function readFont(rel: string): ArrayBuffer {
-  const buf = readFileSync(fileURLToPath(new URL(rel, import.meta.url)));
-  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
+const FONT_URLS = {
+  bold: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ptserif/PT_Serif-Web-Bold.ttf",
+  regular: "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ptserif/PT_Serif-Web-Regular.ttf",
+} as const;
+
+let fontsPromise: Promise<OgFont[]> | null = null;
+
+async function fetchFont(url: string): Promise<ArrayBuffer> {
+  const r = await fetch(url, { cache: "force-cache" });
+  if (!r.ok) throw new Error(`font ${r.status}`);
+  return r.arrayBuffer();
 }
 
-const boldFont = readFont("./PTSerif-Bold.ttf");
-const regularFont = readFont("./PTSerif-Regular.ttf");
-
-export function ogFonts() {
-  return [
-    { name: "PTSerif", data: boldFont, weight: 700 as const, style: "normal" as const },
-    { name: "PTSerif", data: regularFont, weight: 400 as const, style: "normal" as const },
-  ];
+/** PT Serif (Türkçe destekli) fontlarını döndürür; alınamazsa boş dizi (varsayılan font). */
+export function ogFonts(): Promise<OgFont[]> {
+  if (!fontsPromise) {
+    fontsPromise = (async () => {
+      try {
+        const [bold, regular] = await Promise.all([
+          fetchFont(FONT_URLS.bold),
+          fetchFont(FONT_URLS.regular),
+        ]);
+        return [
+          { name: "PTSerif", data: bold, weight: 700, style: "normal" },
+          { name: "PTSerif", data: regular, weight: 400, style: "normal" },
+        ];
+      } catch {
+        return [];
+      }
+    })();
+  }
+  return fontsPromise;
 }
 
 // Krem daire içinde açık kitap (emerald) — emerald zemin üzerinde kullanılır.

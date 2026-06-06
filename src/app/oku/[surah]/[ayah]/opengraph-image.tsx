@@ -94,6 +94,6 @@ export default async function AyahOgImage({
         </div>
       </div>
     ),
-    { ...size, fonts: ogFonts() }
+    { ...size, fonts: await ogFonts() }
   );
 }
