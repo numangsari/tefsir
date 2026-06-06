@@ -64,6 +64,15 @@ const siteJsonLd = [
     alternateName: "Tefsir.net Kur'an-ı Kerim tefsir okuyucu",
     url: "https://tefsir.net",
     inLanguage: "tr",
+    // Google sitelinks arama kutusu: site adı aratınca site içi arama kutusu çıkar
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://tefsir.net/arama?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
   },
   {
     "@context": "https://schema.org",

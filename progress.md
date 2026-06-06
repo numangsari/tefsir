@@ -7,6 +7,17 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-06 (5. iş) — SEO III: sitelinks arama kutusu + iç bağlantı + noindex hijyeni
+
+(Not: 4. iş sonrası OG fontu top-level fs okuması Vercel'de tüm siteyi 500 yapmıştı; commit e917b57 ile font CDN'den lazy fetch'e çevrilip çözüldü.)
+
+- **Sitelinks arama kutusu (SearchAction)**: WebSite JSON-LD'ye `potentialAction` SearchAction (`/arama?q={search_term_string}`) eklendi. Arama sayfası artık mount'ta `window.location.search`'ten `?q=` okuyup aramayı otomatik tetikliyor (deep-link). Böylece Google'da site adı aratınca site içi arama kutusu çıkabilir.
+- **İç bağlantı (taranabilir gezinme)**: Okuyucu sayfasının altına server-render `<nav>` — breadcrumb (Sûreler › Sûre › ayet, gerçek `<a>`) + önceki/sonraki ayet linkleri (`rel=prev/next`, sûre sınırında komşu sûreye geçer). Googlebot bu zinciri izleyerek tüm ayet sayfalarını keşfeder. (AyahSelector'ın JS buton gezinmesi tarayıcı için yetersizdi.)
+- **İnce sayfa hijyeni**: Sadeleştirilmiş içeriği OLMAYAN ayet sayfaları artık `robots: noindex, follow` (generateMetadata'da içerik sayımı). Google ince sayfaları indekslemiyor ama linkleri takip ediyor; içerik eklenince otomatik indekslenebilir oluyor.
+- tsc/lint/build temiz; yerelde doğrulandı (SearchAction, prev/next + sûre sınırı, noindex).
+
+---
+
 ### 2026-06-06 (4. iş) — SEO II: OG görselleri, JSON-LD, Search Console
 
 Görünürlük çalışmasının ikinci dalgası:

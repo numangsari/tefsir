@@ -53,6 +53,13 @@ export default function AramaPage() {
   const [filterSurah, setFilterSurah] = useState("");
   const [filterAyah, setFilterAyah] = useState("");
 
+  // URL'deki ?q= ile gelen aramayı uygula (Google sitelinks arama kutusu /
+  // paylaşılan arama linki buraya düşer). Mount'ta bir kez okunur.
+  useEffect(() => {
+    const initial = new URLSearchParams(window.location.search).get("q");
+    if (initial) setQ(initial);
+  }, []);
+
   useEffect(() => {
     const qq = q.trim();
     if (qq.length < 2) {

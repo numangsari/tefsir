@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { OkuReaderShell } from "@/components/OkuReaderShell";
@@ -28,6 +29,12 @@ export async function generateMetadata({
     select: { meal: true },
   });
 
+  // Sadeleştirilmiş tefsir içeriği olmayan ayet sayfaları "ince"dir → noindex
+  // (Google indekslemesin ama linkleri takip etsin: follow). İçerik eklenince indekslenir.
+  const contentCount = await prisma.tafsirContent.count({
+    where: { ayah: { surahId: sId, number: aNo }, modernizedAt: { not: null } },
+  });
+
   const title = `${s.nameTr} Sûresi ${aNo}. ayet`;
   const meal = ayet?.meal?.replace(/\s+/g, " ").trim();
   const description = meal
@@ -41,6 +48,7 @@ export async function generateMetadata({
     description,
     alternates: { canonical: `/oku/${sId}/${aNo}` },
     openGraph: { title: `${title} · tefsir.net`, description, type: "article" },
+    robots: contentCount === 0 ? { index: false, follow: true } : undefined,
   };
 }
 type SearchParams = {
@@ -136,6 +144,18 @@ export default async function AyahPage({
     },
   ];
 
+  // Taranabilir önceki/sonraki ayet linkleri (sûre sınırında komşu sûreye geçer).
+  // Google bu zinciri izleyerek tüm ayet sayfalarını keşfeder.
+  let prevHref: string | null = null;
+  if (aNo > 1) prevHref = `/oku/${sId}/${aNo - 1}`;
+  else if (sId > 1) {
+    const ps = allSurahs.find((x) => x.id === sId - 1);
+    if (ps) prevHref = `/oku/${sId - 1}/${ps.ayetCount}`;
+  }
+  let nextHref: string | null = null;
+  if (aNo < surahMeta.ayetCount) nextHref = `/oku/${sId}/${aNo + 1}`;
+  else if (sId < 114) nextHref = `/oku/${sId + 1}/1`;
+
   return (
     <div className="mx-auto max-w-[1400px] px-4 pb-6">
       <JsonLd data={ayahJsonLd} />
@@ -157,6 +177,51 @@ export default async function AyahPage({
           flash={flash}
         />
       </Suspense>
+
+      {/* Taranabilir gezinme — SEO için gerçek <a> linkleri (breadcrumb + komşu ayetler) */}
+      <nav
+        aria-label="Ayet gezinme"
+        className="mt-8 border-t border-stone-200 dark:border-stone-800 pt-4"
+      >
+        <div className="text-xs text-stone-500 dark:text-stone-400">
+          <Link href="/sureler" className="hover:text-emerald-700 dark:hover:text-emerald-300">
+            Sûreler
+          </Link>
+          <span className="mx-1.5">›</span>
+          <Link
+            href={`/oku/${sId}/1`}
+            className="hover:text-emerald-700 dark:hover:text-emerald-300"
+          >
+            {surahMeta.nameTr} Sûresi
+          </Link>
+          <span className="mx-1.5">›</span>
+          <span className="text-stone-700 dark:text-stone-300">{aNo}. ayet</span>
+        </div>
+        <div className="mt-3 flex items-center justify-between gap-3 text-sm">
+          {prevHref ? (
+            <Link
+              href={prevHref}
+              rel="prev"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 dark:border-stone-700 px-3 py-2 text-stone-700 dark:text-stone-200 hover:border-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+            >
+              <span aria-hidden>←</span> Önceki ayet
+            </Link>
+          ) : (
+            <span />
+          )}
+          {nextHref ? (
+            <Link
+              href={nextHref}
+              rel="next"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 dark:border-stone-700 px-3 py-2 text-stone-700 dark:text-stone-200 hover:border-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+            >
+              Sonraki ayet <span aria-hidden>→</span>
+            </Link>
+          ) : (
+            <span />
+          )}
+        </div>
+      </nav>
     </div>
   );
 }
