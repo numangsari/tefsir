@@ -63,6 +63,18 @@ export type TrafficStats = {
   topReferrers: { referrer: string; count: number }[];
 };
 
+// İletişim formundan gelen mesajlar
+export type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  subject: string | null;
+  body: string;
+  userId: string | null;
+  readAt: string | null;
+  createdAt: string;
+};
+
 // İçerik & modernizasyon kapsama
 export type TafsirCoverage = {
   tafsirId: number;

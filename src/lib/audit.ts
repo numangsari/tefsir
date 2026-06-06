@@ -6,7 +6,10 @@ export type AuditAction =
   | "user.verify"
   | "user.soft_delete"
   | "user.restore"
-  | "user.hard_delete";
+  | "user.hard_delete"
+  | "contact.read"
+  | "contact.unread"
+  | "contact.delete";
 
 // Yönetici işlemini denetim kaydına yazar. Audit kaydı asıl işlemi BOZMAMALI:
 // hata olursa sessizce yutulur (işlem yine de başarılı sayılır).

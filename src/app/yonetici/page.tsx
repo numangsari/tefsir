@@ -6,15 +6,17 @@ import { TrafikTab } from "./TrafikTab";
 import { KullanicilarTab } from "./KullanicilarTab";
 import { IcerikTab } from "./IcerikTab";
 import { DenetimTab } from "./DenetimTab";
+import { IletisimTab } from "./IletisimTab";
 import { Tabs, type TabDef } from "./ui";
 
-type TabKey = "genel" | "trafik" | "kullanicilar" | "icerik" | "denetim";
+type TabKey = "genel" | "trafik" | "kullanicilar" | "icerik" | "iletisim" | "denetim";
 
 const TABS: TabDef<TabKey>[] = [
   { key: "genel", label: "Genel Bakış" },
   { key: "trafik", label: "Trafik" },
   { key: "kullanicilar", label: "Kullanıcılar" },
   { key: "icerik", label: "İçerik & Modernizasyon" },
+  { key: "iletisim", label: "İletişim" },
   { key: "denetim", label: "Denetim Kaydı" },
 ];
 
@@ -33,6 +35,7 @@ export default function YoneticiPage() {
       {tab === "trafik" && <TrafikTab />}
       {tab === "kullanicilar" && <KullanicilarTab />}
       {tab === "icerik" && <IcerikTab />}
+      {tab === "iletisim" && <IletisimTab />}
       {tab === "denetim" && <DenetimTab />}
     </main>
   );

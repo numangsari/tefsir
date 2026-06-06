@@ -255,3 +255,21 @@ model TafsirReadMark {
   @@unique([userId, tafsirId, ayahId])
   @@index([userId, ayahId])
 }
+
+// İletişim formundan gelen mesajlar. Misafir veya üye gönderebilir; üye ise userId
+// snapshot olarak tutulur (FK değil — kullanıcı silinse de mesaj kalır). Yönetici
+// panelinden okunur; ham IP saklanmaz, yalnızca abuse teşhisi için ipHash.
+model ContactMessage {
+  id        String    @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  body      String
+  userId    String?
+  ipHash    String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([createdAt])
+  @@index([readAt])
+}

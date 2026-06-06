@@ -7,6 +7,23 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-06 (8. iş) — Ana sayfa (tanıtım) + İletişim sayfası
+
+Kullanıcı iki yeni sayfa istedi: (1) sitenin genel tanıtımı olan, tefsir okuma/arama/notlar/hesabım'a yönlendiren bir **ana sayfa**; (2) kullanıcıların mesaj gönderebileceği bir **iletişim sayfası**.
+
+**Onaylanan kararlar:** (a) tanıtım herkese gösterilir (giriş yapan da görür); (b) iletişim mesajları hem Resend ile e-posta gelir hem de DB'ye kaydedilip yönetici panelinde okunur.
+
+**Uygulananlar:**
+1. **Ana sayfa tanıtıma çevrildi** (`src/app/page.tsx`): eskiden `/` = giriş/kayıt ekranıydı (misafire AuthUnified, üyeyi `/oku`'ya redirect). Artık landing: hero (marka + "11 klasik tefsir ile okuyun" + CTA'lar), 4 özellik kartı (Tefsir Oku/Arama/Notlarım/Hesabım), iletişim çağrısı, footer. Misafir/üyeye göre kişiselleşiyor (misafirde "Ücretsiz üye ol" + kartlarda "Üyelik gerekir" rozeti).
+2. **Navigasyon refactor**: `/giris` ve `/kayit` artık doğrudan AuthUnified render ediyor (eskiden `/?tab=`'a redirect; ters çevrildi). TopBar markası `/oku`→`/`, "Giriş yap" `/`→`/giris`, nav'a "İletişim" linki (geniş+mobil) eklendi. Bonus: `/yonetici`'nin zaten yaptığı `/giris?callbackUrl=...` redirect artık doğru çalışıyor.
+3. **İletişim sayfası** (`src/app/iletisim/`): `layout.tsx` (TopBar, arama deseni), `page.tsx` (üyede ad/e-posta ön-dolu), `ContactForm.tsx` (client; honeypot spam koruması, başarı ekranı, `useToast`).
+4. **`POST /api/contact`**: doğrulama (ad/e-posta/mesaj zorunlu, uzunluk, e-posta regex), honeypot, `rateLimit` (IP başına saatte 5), `ContactMessage` create, `sendContactNotification` (Resend; `to`=`CONTACT_EMAIL`||numangsari@gmail.com, `replyTo`=gönderen; e-posta hata olsa bile DB kaydı korunur).
+5. **`ContactMessage` modeli** (`prisma/schema.prisma`): name/email/subject/body/userId(snapshot)/ipHash(tuzlu, ham IP yok)/readAt/createdAt.
+6. **Yönetici "İletişim" sekmesi** (panel artık 6 sekme): `IletisimTab.tsx` (okunmamış rozeti, okundu/okunmadı toggle, mailto yanıtla, sil), `api/admin/contact` (GET/PATCH/DELETE, ADMIN korumalı, `recordAudit`'e contact.read/unread/delete eklendi). `email.ts`'e `sendContactNotification` + HTML-escape'li `contactTemplate`.
+7. **SEO/env**: `sitemap.ts`'e `/iletisim`; `.env.example`'a `CONTACT_EMAIL` notu.
+
+tsc/lint/build temiz (lint'te yalnız önceden var olan font uyarısı). **⚠️ KALAN: `ContactMessage` tablosu production Neon'a henüz push EDİLMEDİ** — güvenlik sınıflandırıcısı prod DB push'unu engelledi, kullanıcı onayı bekliyor. Kullanıcı şunu çalıştırmalı: `env -u DATABASE_URL -u DIRECT_URL npx prisma db push`. Push yapılmadan iletişim formu DB'ye yazamaz (500). Push sonrası dev'de uçtan uca test (form gönder → panelde gör) yapılmalı.
+
 ### 2026-06-06 (7. iş) — Mobil uyumluluk
 
 Kullanıcı sitenin mobil için uyumlu hale getirilmesini, önce tam analiz yapılmasını istedi. Tüm sayfalar incelendi; asıl sorun **okuyucu sayfasıydı** (`/oku`): masaüstünde 3 sütunlu grid (tefsir listesi · metin · not/vurgu araçları) mobilde alt alta diziliyor, kullanıcı metne ulaşmak için 11 tefsir kartını kaydırmak zorunda kalıyor, "Sıradaki" butonu sayfanın en altında erişilemez oluyordu. Ayrıca Arapça kelime tooltip'i sadece hover ile açıldığından dokunmatik cihazlarda hiç çalışmıyordu.

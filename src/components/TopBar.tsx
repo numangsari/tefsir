@@ -28,7 +28,7 @@ export function TopBar({
 
   return (
     <header className="bg-emerald-800 dark:bg-emerald-950 text-emerald-50 px-4 py-2 flex items-center justify-between text-sm gap-2">
-      <Link href="/oku" aria-label="tefsir.net ana sayfa" className="whitespace-nowrap">
+      <Link href="/" aria-label="tefsir.net ana sayfa" className="whitespace-nowrap">
         <BrandLogo />
       </Link>
 
@@ -56,6 +56,9 @@ export function TopBar({
             Notlarım
           </Link>
         )}
+        <Link href="/iletisim" className="px-2 py-1 rounded hover:bg-emerald-700">
+          İletişim
+        </Link>
         {!isGuest && (
           <Link href="/profil" className="px-2 py-1 rounded hover:bg-emerald-700">
             Hesabım
@@ -76,7 +79,7 @@ export function TopBar({
         </button>
         {isGuest ? (
           <Link
-            href="/"
+            href="/giris"
             className="ml-1 px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 font-medium"
           >
             Giriş yap
@@ -118,11 +121,12 @@ export function TopBar({
             {!isGuest && (
               <MobileLink href="/profil" onClick={() => setOpen(false)}>Hesabım</MobileLink>
             )}
+            <MobileLink href="/iletisim" onClick={() => setOpen(false)}>İletişim</MobileLink>
             {role === "ADMIN" && (
               <MobileLink href="/yonetici" onClick={() => setOpen(false)}>Yönetici</MobileLink>
             )}
             {isGuest && (
-              <MobileLink href="/" onClick={() => setOpen(false)}>Giriş yap</MobileLink>
+              <MobileLink href="/giris" onClick={() => setOpen(false)}>Giriş yap</MobileLink>
             )}
           </div>
         )}

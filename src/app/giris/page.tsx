@@ -1,5 +1,12 @@
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { AuthUnified } from "@/components/AuthUnified";
 
-export default function GirisPage() {
-  redirect("/?tab=giris");
+export const dynamic = "force-dynamic";
+
+export default async function GirisPage() {
+  const session = await auth();
+  if (session?.user) redirect("/oku");
+
+  return <AuthUnified defaultTab="giris" />;
 }
