@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signOutCompletely } from "@/lib/sign-out";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/Toaster";
+import { TAFSIRS } from "@/data/tafsirs";
 
 type Profile = {
   id: string;
@@ -43,6 +44,10 @@ export default function ProfilePage() {
   const [pwErr, setPwErr] = useState<string | null>(null);
   const [pwLoading, setPwLoading] = useState(false);
 
+  // Favori tefsirler
+  const [favoriteTafsirIds, setFavoriteTafsirIds] = useState<Set<number>>(new Set());
+  const [favLoading, setFavLoading] = useState(true);
+
   // Hesap silme
   const [delPw, setDelPw] = useState("");
   const [delConfirm, setDelConfirm] = useState(false);
@@ -71,6 +76,42 @@ export default function ProfilePage() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      const r = await fetch("/api/my/favorite-tafsirs", { cache: "no-store" });
+      if (r.ok) {
+        const d = (await r.json()) as { tafsirIds: number[] };
+        setFavoriteTafsirIds(new Set(d.tafsirIds));
+      }
+      setFavLoading(false);
+    })();
+  }, []);
+
+  async function toggleFavorite(tafsirId: number) {
+    const isFav = favoriteTafsirIds.has(tafsirId);
+    setFavoriteTafsirIds((prev) => {
+      const next = new Set(prev);
+      if (isFav) next.delete(tafsirId);
+      else next.add(tafsirId);
+      return next;
+    });
+    const r = await fetch("/api/my/favorite-tafsirs", {
+      method: isFav ? "DELETE" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tafsirId }),
+    });
+    if (!r.ok) {
+      // Hata olursa geri al
+      setFavoriteTafsirIds((prev) => {
+        const next = new Set(prev);
+        if (isFav) next.add(tafsirId);
+        else next.delete(tafsirId);
+        return next;
+      });
+      toast.error("Kaydedilemedi.");
+    }
+  }
 
   async function saveName(e: React.FormEvent) {
     e.preventDefault();
@@ -210,6 +251,49 @@ export default function ProfilePage() {
                 </div>
               </li>
             ))}
+          </ul>
+        )}
+      </section>
+
+      {/* Favori Tefsirler */}
+      <section className="surface-glass !rounded-xl p-5">
+        <h2 className="font-medium mb-1 text-stone-800 dark:text-stone-100">
+          Favori Tefsirler
+        </h2>
+        <p className="text-xs text-stone-500 dark:text-stone-400 mb-4">
+          Seçtiğiniz tefsirler okuma ekranında listenin başına sabitlenir.
+        </p>
+        {favLoading ? (
+          <p className="text-sm text-stone-400 dark:text-stone-500">Yükleniyor…</p>
+        ) : (
+          <ul className="space-y-1.5">
+            {TAFSIRS.map((t) => {
+              const isFav = favoriteTafsirIds.has(t.id);
+              return (
+                <li key={t.id}>
+                  <button
+                    type="button"
+                    onClick={() => toggleFavorite(t.id)}
+                    className={`w-full flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm text-left transition-colors ${
+                      isFav
+                        ? "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700"
+                        : "bg-white/60 dark:bg-stone-900/50 border-stone-200/70 dark:border-white/10 hover:border-emerald-400/60"
+                    }`}
+                  >
+                    <span className={`text-base leading-none shrink-0 ${isFav ? "text-amber-400" : "text-stone-300 dark:text-stone-600"}`}>
+                      {isFav ? "★" : "☆"}
+                    </span>
+                    <span>
+                      <span className="font-medium text-stone-800 dark:text-stone-100">{t.name}</span>
+                      <span className="text-stone-500 dark:text-stone-400 ml-1.5 text-xs">
+                        {t.author}
+                        {t.deathYearGregorian ? ` · ö. ${t.deathYearHijri}/${t.deathYearGregorian}` : ""}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

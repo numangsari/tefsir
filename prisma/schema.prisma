@@ -78,10 +78,11 @@ model Tafsir {
   deathYearHijri Int? // ör. 685
   deathYearGregorian Int? // ör. 1286
 
-  contents  TafsirContent[]
-  highlights Highlight[]
-  notes     Note[]
-  readMarks TafsirReadMark[]
+  contents     TafsirContent[]
+  highlights   Highlight[]
+  notes        Note[]
+  readMarks    TafsirReadMark[]
+  favoritedBy  FavoriteTafsir[]
 }
 
 // Bir tefsirin bir ayet hakkındaki metni
@@ -135,6 +136,7 @@ model User {
   highlights        Highlight[]
   notes             Note[]
   tafsirReadMarks   TafsirReadMark[]
+  favoriteTafsirs   FavoriteTafsir[]
   emailVerifications EmailVerification[]
   passwordResets    PasswordReset[]
 }
@@ -254,6 +256,20 @@ model TafsirReadMark {
 
   @@unique([userId, tafsirId, ayahId])
   @@index([userId, ayahId])
+}
+
+// Kullanıcının favori olarak işaretlediği tefsirler — okuyucuda listenin başına sabitlenir.
+model FavoriteTafsir {
+  id        String   @id @default(cuid())
+  userId    String
+  tafsirId  Int
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tafsir Tafsir @relation(fields: [tafsirId], references: [id])
+
+  @@unique([userId, tafsirId])
+  @@index([userId])
 }
 
 // İletişim formundan gelen mesajlar. Misafir veya üye gönderebilir; üye ise userId

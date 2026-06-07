@@ -194,7 +194,7 @@ export default async function AyahPage({
       {/* Taranabilir gezinme — SEO için gerçek <a> linkleri (breadcrumb + komşu ayetler) */}
       <nav
         aria-label="Ayet gezinme"
-        className="mt-8 border-t border-stone-200 dark:border-stone-800 pt-4"
+        className="mt-8 border-t border-stone-200 dark:border-stone-800 pt-4 mb-20 md:mb-0"
       >
         <div className="text-xs text-stone-500 dark:text-stone-400">
           <Link href="/sureler" className="hover:text-emerald-700 dark:hover:text-emerald-300">

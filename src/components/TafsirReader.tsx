@@ -53,6 +53,8 @@ export function TafsirReader({
   showNotes,
   onShowNotesChange,
   onAdvance,
+  favoriteTafsirIds,
+  onFavoriteToggle,
   focusHighlightId,
   focusNoteId,
   focusFind,
@@ -72,6 +74,8 @@ export function TafsirReader({
   onShowNotesChange: (v: boolean) => void;
   /** Verilen tefsirden bir sonrakine; o son tefsirse sıradaki ayete geçer */
   onAdvance: (fromTafsirId: number | null) => void;
+  favoriteTafsirIds?: Set<number>;
+  onFavoriteToggle?: (tafsirId: number) => void;
   focusHighlightId?: string;
   focusNoteId?: string;
   focusFind?: string;
@@ -404,6 +408,7 @@ export function TafsirReader({
           {tafsirs.map((t) => {
             const isRead = readTafsirIds.has(t.id);
             const isSelected = selectedId === t.id && !showNotes;
+            const isFav = favoriteTafsirIds?.has(t.id) ?? false;
             return (
             <li key={t.id}>
               <div
@@ -423,7 +428,7 @@ export function TafsirReader({
                     onSelectedIdChange(t.id);
                     setMobilePane("text");
                   }}
-                  className="w-full text-left px-3 py-2.5 pr-12"
+                  className={`w-full text-left px-3 py-2.5 ${onFavoriteToggle ? "pr-20" : "pr-12"}`}
                 >
                   <div className={`font-medium ${isSelected ? "text-white" : ""}`}>{t.name}</div>
                 <div
@@ -450,6 +455,26 @@ export function TafsirReader({
                   ) : null}
                 </div>
                 </button>
+                {onFavoriteToggle && (
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); onFavoriteToggle(t.id); }}
+                    title={isFav ? "Favoriden çıkar" : "Favoriye ekle"}
+                    aria-label={isFav ? "Favoriden çıkar" : "Favoriye ekle"}
+                    aria-pressed={isFav}
+                    className={`absolute right-12 top-1/2 -translate-y-1/2 flex items-center justify-center w-7 h-7 rounded-full transition-colors ${
+                      isFav
+                        ? "text-amber-400"
+                        : isSelected
+                        ? "text-emerald-200/60 hover:text-amber-300"
+                        : "text-stone-300 dark:text-stone-600 hover:text-amber-400"
+                    }`}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={isFav ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={(e) => {

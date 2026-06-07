@@ -7,6 +7,31 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-08 (15. iş) — Mobil önceki/sonraki ayet butonu + favori tefsir özelliği ✅
+
+**Düzeltme 1 — Mobil önceki/sonraki ayet butonları yarım görünüyordu:**
+`<nav aria-label="Ayet gezinme">` alt sekme çubuğu (~60px sabit) tarafından örtülüyordu.
+`mb-20 md:mb-0` eklenerek çözüldü; kullanıcı nav içeriğini sekme çubuğunun üzerinde kaydırabilir.
+
+**Düzeltme 2 — Favori Tefsir özelliği:**
+- `prisma/schema.prisma`: `FavoriteTafsir` modeli eklendi (userId + tafsirId, unique index)
+- `api/my/favorite-tafsirs`: GET/POST/DELETE endpoint'i
+- `OkuReaderShell.tsx`: favori id'leri fetch + `sortedTafsirs` (favs önce) + `handleAdvance` güncellendi; `toggleFavorite` optimistik
+- `TafsirReader.tsx`: `favoriteTafsirIds` + `onFavoriteToggle` prop'ları; her tefsir öğesine ★ butonu (girişli kullanıcılara); favori olunca amber renk
+- `profil/page.tsx`: "Favori Tefsirler" bölümü — tüm 11 tefsir ★ toggle ile listelenir
+
+**Gerekli:** `env -u DATABASE_URL -u DIRECT_URL npx prisma db push` (production Neon'a FavoriteTafsir tablosunu ekle)
+
+**Değiştirilen Dosyalar:**
+- `prisma/schema.prisma`: FavoriteTafsir modeli + User/Tafsir ilişkileri
+- `src/app/api/my/favorite-tafsirs/route.ts`: Yeni (oluşturuldu)
+- `src/app/oku/[surah]/[ayah]/page.tsx`: nav mb-20 md:mb-0
+- `src/components/OkuReaderShell.tsx`: favori state + sıralama + toggle
+- `src/components/TafsirReader.tsx`: ★ butonu + favoriteTafsirIds/onFavoriteToggle prop
+- `src/app/profil/page.tsx`: Favori Tefsirler bölümü
+
+tsc/build temiz. DB migration kullanıcı onayı gerektirir.
+
 ### 2026-06-07 (14. iş) — Mobil hamburger menü tıklanamıyor düzeltildi ✅
 
 `backdrop-blur-md` eklenen `<header>` elementi CSS stacking context oluşturdu ama `position: static` olduğu için içindeki `z-index` etkisizleşti ve dropdown diğer sayfa elementlerinin altında kalıyordu.

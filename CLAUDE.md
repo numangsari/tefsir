@@ -28,6 +28,7 @@ Next.js App Router; API route'ları `src/app/api/` altında. Tefsir verisi Postg
 | `src/app/api/admin/contact/route.ts` | ADMIN: iletişim mesajları GET/PATCH(okundu)/DELETE; recordAudit |
 | `src/app/api/admin/contact/reply/route.ts` | ADMIN: mesaja site adına (noreply@tefsir.net) Resend yanıtı; replyTo=CONTACT_EMAIL; gönderince okundu+audit (contact.reply) |
 | `src/app/api/my/progress/route.ts` | Okuma ilerlemesi: sûre bazında okunan tefsir-metni / toplam (raw SQL); sadece başlanan sûreler. Profil "Okuma ilerlemesi" bölümünü besler |
+| `src/app/api/my/favorite-tafsirs/route.ts` | GET/POST/DELETE: kullanıcının favori tefsirlerini yönetir; `/api/my/:path*` middleware koruması altında |
 | `src/app/yonetici/IletisimTab.tsx` | Panel "İletişim" sekmesi (6. sekme); okunmamış rozeti, okundu/yanıtla/sil |
 | `src/app/oku/[surah]/[ayah]/page.tsx` | Ana okuyucu sayfası |
 | `src/components/TafsirReader.tsx` | Tefsir listesi + içerik paneli. Masaüstü 3 sütun grid; mobilde `mobilePane` state ile sekmeli (alt sekme çubuğu: Tefsirler/Metin/Araçlar) |
@@ -96,8 +97,10 @@ npx prisma studio    # DB görsel arayüzü
 ## Bir Sonraki Oturumda Önce Bunlara Bak
 - [x] **Analitik canlı doğrulaması**: ✅ doğrulandı (12. iş)
 - [x] **Google Search Console**: ✅ doğrulama + sitemap gönderimi yapıldı (12. iş)
+- [x] **Mobil önceki/sonraki ayet butonu**: ✅ düzeltildi (15. iş)
+- [ ] **FavoriteTafsir DB migration**: `env -u DATABASE_URL -u DIRECT_URL npx prisma db push` — yeni tablo production Neon'a henüz push edilmedi.
 - [ ] **Mobil dokunmatik testi**: gerçek telefonda `/oku` aç — alt sekme çubuğu geçişleri, Arapça kelimeye dokununca tooltip, "Sıradaki" erişimi, başlığın kompaktlaşması akıcı mı kontrol et.
 - [ ] **Tefsir modernizasyonu**: `modernize-tafsirs.ts` ile AI sadeleştirmeyi ilerlet (şu an ~612/68k modernize).
 
 ## Son Güncelleme
-2026-06-07 (13. iş) — Kapsamlı denetim düzeltmeleri: CSP Vercel Analytics eklendi, kırık link düzeltildi, e-posta yeniden doğrulama endpoint'i + UI, ilerleme yüzdesi modernizedAt filtresi, NoteEditor opak, cheerio/iconv-lite devDep'e taşındı.
+2026-06-08 (15. iş) — Mobil önceki/sonraki ayet düzeltmesi + FavoriteTafsir özelliği: Prisma model, API route, OkuReaderShell sıralama, TafsirReader ★ butonu, profil "Favori Tefsirler" bölümü.
