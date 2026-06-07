@@ -7,6 +7,31 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-07 (13. iş) — Kapsamlı denetim bulguları düzeltildi ✅
+
+Tam proje denetimi yapıldı; tespit edilen 6 sorun giderildi.
+
+**Düzeltilen yerler:**
+- `next.config.ts`: CSP'ye `va.vercel-scripts.com` (script-src) ve `vitals.vercel-insights.com` (connect-src) eklendi — Vercel Analytics artık çalışıyor
+- `emaili-dogrula/page.tsx`: Kırık `/?tab=kayit` linki → `/kayit` düzeltildi; hem "süresi doldu" hem de "e-posta gönderildi" ekranlarına yeniden gönderme formu eklendi
+- `api/auth/resend-verification/route.ts`: Yeni endpoint — doğrulama e-postasını yeniden gönderir; eski tokenları temizler; 5/15dk rate limit middleware'de de eklendi
+- `middleware.ts`: `resend-verification` matcher ve `AUTH_ROUTES`'a eklendi
+- `api/my/progress/route.ts`: İlerleme yüzdesi paydasına `modernizedAt IS NOT NULL` filtresi eklendi — gizli içerik artık sayıya dahil değil
+- `TafsirReader.tsx:724`: NoteEditor textarea `bg-white/70` → `bg-white` (şeffaflık giderildi)
+- `package.json`: `cheerio` ve `iconv-lite` production'dan devDependencies'e taşındı
+
+**Değiştirilen Dosyalar:**
+- `next.config.ts`: CSP script-src + connect-src güncellendi
+- `src/app/emaili-dogrula/page.tsx`: Kırık link düzeltildi + ResendForm bileşeni eklendi
+- `src/app/api/auth/resend-verification/route.ts`: Yeni (oluşturuldu)
+- `src/middleware.ts`: resend-verification rate limit eklendi
+- `src/app/api/my/progress/route.ts`: modernizedAt filtresi eklendi
+- `src/components/TafsirReader.tsx`: textarea opak yapıldı
+- `package.json` + `package-lock.json`: bağımlılıklar yeniden düzenlendi
+
+**Sonraki Adımlar:**
+- [ ] Tefsir modernizasyonunu ilerlet (`modernize-tafsirs.ts`, Gemini veya Ollama)
+
 ### 2026-06-07 (12. iş) — Analitik doğrulama + Google Search Console kurulumu ✅
 
 - **Yönetici → Trafik sekmesi** canlıda doğrulandı: ziyaret sayacı düşüyor.
@@ -128,30 +153,6 @@ NOT: JWT session kullanıldığı için `auth()` her API çağrısında DB'ye gi
 - **İnce sayfa hijyeni**: Sadeleştirilmiş içeriği OLMAYAN ayet sayfaları artık `robots: noindex, follow` (generateMetadata'da içerik sayımı). Google ince sayfaları indekslemiyor ama linkleri takip ediyor; içerik eklenince otomatik indekslenebilir oluyor.
 - tsc/lint/build temiz; yerelde doğrulandı (SearchAction, prev/next + sûre sınırı, noindex).
 
----
-
-### 2026-06-06 (4. iş) — SEO II: OG görselleri, JSON-LD, Search Console
-
-Görünürlük çalışmasının ikinci dalgası:
-
-- **OG (paylaşım) görselleri**: `next/og` ile dinamik 1200×630 PNG. Kök `opengraph-image.tsx` (marka kartı) + ayet bazlı `oku/[surah]/[ayah]/opengraph-image.tsx` ("Bakara Sûresi 6. ayet" + meal alıntısı). Türkçe karakterler için PT Serif TTF gömüldü (`src/app/_og/`); Node `fetch` `file:`'i desteklemediğinden font `readFileSync(fileURLToPath(new URL(...)))` ile okunuyor (build + Vercel file-tracing uyumlu). Yerelde render doğrulandı.
-- **JSON-LD yapısal veri**: `JsonLd` bileşeni. Layout'ta WebSite + Organization; okuyucu sayfasında Article + BreadcrumbList (sûre/ayet kırılımı). Zengin sonuç/kırıntı için.
-- **Google Search Console**: `layout.tsx` metadata'sına `verification.google` (env: `GOOGLE_SITE_VERIFICATION`); `.env.example`'a eklendi. Kullanıcı GSC'den HTML-etiketi kodunu alıp Vercel env'e koyacak, sonra sitemap'i gönderecek.
-- tsc/lint/build temiz; kök OG statik (○), ayet OG dinamik (ƒ) üretildi.
-
-**Sonraki olası SEO adımları**: Search Console doğrulama + sitemap gönderimi (kullanıcı), sitelinks arama kutusu için `/arama?q=` deep-link desteği, sayfa içi iç bağlantı zenginleştirme.
-
----
-
-### 2026-06-06 (3. iş) — Logo, marka kimliği ve SEO başlangıcı + Sıradaki konumu
-
-İlk "internette görünür olma" adımları ve okuyucu yerleşim düzeltmesi:
-
-- **"Sıradaki" butonu sağ panele alındı**: Artık tefsirin en altına inmeden de görünüyor — sağ panel sticky bir flex sütun; vurgu/not listesi içte kayıyor, "Sıradaki tefsir/ayet" butonu panelin altına sabit. Çakışmasın diye **"en üste çık" butonu sol alta** taşındı.
-- **Logo**: `BrandLogo`/`BrandMark` (bağımsız SVG — açık kitap işareti + "tefsir.net" kelime markası); üst çubukta düz metin yerine kullanılıyor. Favicon: `src/app/icon.svg` (Next otomatik favicon).
-- **Sekme başlığı + per-sayfa başlık**: `layout.tsx` metadata yenilendi — `title` artık `{ default, template: "%s · tefsir.net" }`. Okuyucu sayfasına `generateMetadata` eklendi → ör. "Bakara Sûresi 6. ayet · tefsir.net" + meal'den açıklama. Sûreler sayfasına da başlık.
-- **SEO altyapısı**: `metadataBase`, description, keywords, openGraph, twitter, robots meta; `src/app/robots.ts` (yönetici/panel/api/yazdir kapalı) ve `src/app/sitemap.ts` (yalnızca sadeleştirilmiş içeriği olan ayet sayfaları + ana sayfalar; günlük revalidate).
-- tsc/lint/build temiz; `/icon.svg`, `/robots.txt`, `/sitemap.xml` route'ları üretildi.
 ## 🐛 Bilinen Sorunlar
 - Modernizasyon `modernize-tafsirs.ts` Ollama ile çalışırken çok kaynak tüketir; `--pauseMs=8000 --ollamaThreads=2` ile hafiflet
 - Dev sunucu hata verirse: `rm -rf .next && npm run dev` (eski chunk önbelleği)

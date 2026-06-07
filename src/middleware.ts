@@ -2,7 +2,12 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 
-const AUTH_ROUTES = new Set(["/api/kayit", "/api/auth/forgot-password", "/api/auth/reset-password"]);
+const AUTH_ROUTES = new Set([
+  "/api/kayit",
+  "/api/auth/forgot-password",
+  "/api/auth/reset-password",
+  "/api/auth/resend-verification",
+]);
 
 function getIp(req: NextRequest) {
   return (
@@ -100,6 +105,7 @@ export const config = {
     "/api/kayit",
     "/api/auth/forgot-password",
     "/api/auth/reset-password",
+    "/api/auth/resend-verification",
     "/api/auth/callback/credentials",
   ],
 };

@@ -721,7 +721,7 @@ function NoteEditor({
           value={body}
           onChange={(e) => setBody(e.target.value)}
           rows={5}
-          className="w-full border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
+          className="w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
           placeholder="Notunuzu yazın..."
           autoFocus
         />

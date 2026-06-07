@@ -1,5 +1,27 @@
 # tefsirnet — İlerleme Arşivi
 
+### 2026-06-06 (4. iş) — SEO II: OG görselleri, JSON-LD, Search Console
+
+Görünürlük çalışmasının ikinci dalgası:
+
+- **OG (paylaşım) görselleri**: `next/og` ile dinamik 1200×630 PNG. Kök `opengraph-image.tsx` (marka kartı) + ayet bazlı `oku/[surah]/[ayah]/opengraph-image.tsx` ("Bakara Sûresi 6. ayet" + meal alıntısı). Türkçe karakterler için PT Serif TTF gömüldü (`src/app/_og/`); Node `fetch` `file:`'i desteklemediğinden font `readFileSync(fileURLToPath(new URL(...)))` ile okunuyor (build + Vercel file-tracing uyumlu). Yerelde render doğrulandı.
+- **JSON-LD yapısal veri**: `JsonLd` bileşeni. Layout'ta WebSite + Organization; okuyucu sayfasında Article + BreadcrumbList (sûre/ayet kırılımı). Zengin sonuç/kırıntı için.
+- **Google Search Console**: `layout.tsx` metadata'sına `verification.google` (env: `GOOGLE_SITE_VERIFICATION`); `.env.example`'a eklendi. Kullanıcı GSC'den HTML-etiketi kodunu alıp Vercel env'e koyacak, sonra sitemap'i gönderecek.
+- tsc/lint/build temiz; kök OG statik (○), ayet OG dinamik (ƒ) üretildi.
+
+**Sonraki olası SEO adımları**: Search Console doğrulama + sitemap gönderimi (kullanıcı), sitelinks arama kutusu için `/arama?q=` deep-link desteği, sayfa içi iç bağlantı zenginleştirme.
+
+---
+
+### 2026-06-06 (3. iş) — Logo, marka kimliği ve SEO başlangıcı + Sıradaki konumu
+
+İlk "internette görünür olma" adımları ve okuyucu yerleşim düzeltmesi:
+
+- **"Sıradaki" butonu sağ panele alındı**: Artık tefsirin en altına inmeden de görünüyor — sağ panel sticky bir flex sütun; vurgu/not listesi içte kayıyor, "Sıradaki tefsir/ayet" butonu panelin altına sabit. Çakışmasın diye **"en üste çık" butonu sol alta** taşındı.
+- **Logo**: `BrandLogo`/`BrandMark` (bağımsız SVG — açık kitap işareti + "tefsir.net" kelime markası); üst çubukta düz metin yerine kullanılıyor. Favicon: `src/app/icon.svg` (Next otomatik favicon).
+- **Sekme başlığı + per-sayfa başlık**: `layout.tsx` metadata yenilendi — `title` artık `{ default, template: "%s · tefsir.net" }`. Okuyucu sayfasına `generateMetadata` eklendi → ör. "Bakara Sûresi 6. ayet · tefsir.net" + meal'den açıklama. Sûreler sayfasına da başlık.
+- **SEO altyapısı**: `metadataBase`, description, keywords, openGraph, twitter, robots meta; `src/app/robots.ts` (yönetici/panel/api/yazdir kapalı) ve `src/app/sitemap.ts` (yalnızca sadeleştirilmiş içeriği olan ayet sayfaları + ana sayfalar; günlük revalidate).
+- tsc/lint/build temiz; `/icon.svg`, `/robots.txt`, `/sitemap.xml` route'ları üretildi.
 
 ---
 

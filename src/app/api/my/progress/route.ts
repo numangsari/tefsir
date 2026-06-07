@@ -33,6 +33,7 @@ export async function GET() {
       FROM "TafsirContent" tc
       JOIN "Ayah" a ON a.id = tc."ayahId"
       WHERE a."surahId" IN (${Prisma.join(startedIds)})
+        AND tc."modernizedAt" IS NOT NULL
       GROUP BY a."surahId"
     `,
     prisma.surah.findMany({

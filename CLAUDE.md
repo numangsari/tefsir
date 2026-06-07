@@ -23,6 +23,7 @@ Next.js App Router; API route'ları `src/app/api/` altında. Tefsir verisi Postg
 | `src/app/page.tsx` | **Ana sayfa = tanıtım/landing** (8. iş). Herkese gösterilir; misafir/üyeye göre kişiselleşir. Eskiden giriş/kayıt ekranıydı |
 | `src/app/giris/page.tsx` / `src/app/kayit/page.tsx` | AuthUnified'i render eder (defaultTab giris/kayit). Eskiden `/?tab=`'a redirect ediyordu — ters çevrildi (8. iş) |
 | `src/app/iletisim/{layout,page}.tsx` + `ContactForm.tsx` | İletişim sayfası: form (honeypot, başarı ekranı, üyede ön-dolu) |
+| `src/app/api/auth/resend-verification/route.ts` | POST: e-posta doğrulama tokenini yeniden gönderir; eski tokenları temizler; 5/15dk rate limit (middleware) |
 | `src/app/api/contact/route.ts` | POST: doğrulama + rateLimit (saatte 5) + ContactMessage create + Resend bildirim |
 | `src/app/api/admin/contact/route.ts` | ADMIN: iletişim mesajları GET/PATCH(okundu)/DELETE; recordAudit |
 | `src/app/api/admin/contact/reply/route.ts` | ADMIN: mesaja site adına (noreply@tefsir.net) Resend yanıtı; replyTo=CONTACT_EMAIL; gönderince okundu+audit (contact.reply) |
@@ -99,4 +100,4 @@ npx prisma studio    # DB görsel arayüzü
 - [ ] **Tefsir modernizasyonu**: `modernize-tafsirs.ts` ile AI sadeleştirmeyi ilerlet (şu an ~612/68k modernize).
 
 ## Son Güncelleme
-2026-06-07 (12. iş) — Analitik doğrulama + Google Search Console kurulumu tamamlandı.
+2026-06-07 (13. iş) — Kapsamlı denetim düzeltmeleri: CSP Vercel Analytics eklendi, kırık link düzeltildi, e-posta yeniden doğrulama endpoint'i + UI, ilerleme yüzdesi modernizedAt filtresi, NoteEditor opak, cheerio/iconv-lite devDep'e taşındı.
