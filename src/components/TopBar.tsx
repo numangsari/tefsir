@@ -27,7 +27,7 @@ export function TopBar({
   }, [open]);
 
   return (
-    <header className="backdrop-blur-md bg-white/70 dark:bg-black/40 border-b border-stone-200/70 dark:border-white/10 text-stone-700 dark:text-emerald-50 px-4 py-2 flex items-center justify-between text-sm gap-2">
+    <header className="relative z-50 backdrop-blur-md bg-white/70 dark:bg-black/40 border-b border-stone-200/70 dark:border-white/10 text-stone-700 dark:text-emerald-50 px-4 py-2 flex items-center justify-between text-sm gap-2">
       <Link href="/" aria-label="tefsir.net ana sayfa" className="whitespace-nowrap">
         <BrandLogo />
       </Link>

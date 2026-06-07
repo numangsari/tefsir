@@ -7,6 +7,15 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-07 (14. iş) — Mobil hamburger menü tıklanamıyor düzeltildi ✅
+
+`backdrop-blur-md` eklenen `<header>` elementi CSS stacking context oluşturdu ama `position: static` olduğu için içindeki `z-index` etkisizleşti ve dropdown diğer sayfa elementlerinin altında kalıyordu.
+
+**Düzeltme:** `TopBar.tsx` — `<header>` sınıfına `relative z-50` eklendi; dropdown artık header'a göre konumlanıyor ve z-index düzgün çalışıyor.
+
+**Değiştirilen Dosyalar:**
+- `src/components/TopBar.tsx`: header'a `relative z-50` eklendi
+
 ### 2026-06-07 (13. iş) — Kapsamlı denetim bulguları düzeltildi ✅
 
 Tam proje denetimi yapıldı; tespit edilen 6 sorun giderildi.
