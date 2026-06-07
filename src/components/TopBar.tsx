@@ -107,7 +107,7 @@ export function TopBar({
           ☰
         </button>
         {open && (
-          <div className="absolute right-3 top-12 z-30 backdrop-blur-md bg-white/90 dark:bg-stone-900/90 border border-stone-200 dark:border-white/10 text-stone-700 dark:text-emerald-50 rounded-xl shadow-glow min-w-[180px] py-1">
+          <div className="absolute right-3 top-12 z-30 bg-white dark:bg-stone-900 border border-stone-200 dark:border-white/10 text-stone-700 dark:text-emerald-50 rounded-xl shadow-glow min-w-[180px] py-1">
             <div className="px-3 py-1.5 text-xs text-stone-500 dark:text-emerald-200/80 border-b border-stone-200 dark:border-white/10">
               {isGuest ? "Misafir" : userName}
             </div>

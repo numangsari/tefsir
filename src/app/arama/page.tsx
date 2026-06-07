@@ -121,7 +121,7 @@ export default function AramaPage() {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Ara (en az 2 karakter)..."
-        className="w-full border rounded-lg px-3 py-2 bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition mb-3"
+        className="w-full border rounded-lg px-3 py-2 bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition mb-3"
       />
 
       <div className="flex flex-wrap gap-2 mb-3">
@@ -153,7 +153,7 @@ export default function AramaPage() {
             value={filterSurah}
             onChange={(e) => setFilterSurah(e.target.value)}
             placeholder="Örn. 2"
-            className="w-24 border rounded-lg px-2 py-1 bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
+            className="w-24 border rounded-lg px-2 py-1 bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
           />
         </label>
         <label className="text-sm">
@@ -164,7 +164,7 @@ export default function AramaPage() {
             value={filterAyah}
             onChange={(e) => setFilterAyah(e.target.value)}
             placeholder="Örn. 255"
-            className="w-24 border rounded-lg px-2 py-1 bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
+            className="w-24 border rounded-lg px-2 py-1 bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
           />
         </label>
       </div>

@@ -56,12 +56,12 @@ export function SurahIndexView({ surahs }: { surahs: Surah[] }) {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Sûre adı, numarası veya anlamı ile ara..."
-          className="border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
+          className="border rounded-lg px-3 py-2 text-sm bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         />
         <select
           value={type}
           onChange={(e) => setType(e.target.value as "all" | "mekki" | "medeni")}
-          className="border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
+          className="border rounded-lg px-3 py-2 text-sm bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         >
           <option value="all">Tümü</option>
           <option value="mekki">Mekkî</option>
@@ -70,7 +70,7 @@ export function SurahIndexView({ surahs }: { surahs: Surah[] }) {
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as SortKey)}
-          className="border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
+          className="border rounded-lg px-3 py-2 text-sm bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         >
           <option value="mushaf">Mushaf sırası</option>
           <option value="revelation">Nüzul sırası</option>

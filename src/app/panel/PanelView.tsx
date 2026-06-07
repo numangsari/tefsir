@@ -96,7 +96,7 @@ export function PanelView({
             <select
               value={filterSurah}
               onChange={(e) => setFilterSurah(e.target.value)}
-              className="w-full border rounded-lg px-2 py-1.5 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
+              className="w-full border rounded-lg px-2 py-1.5 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
             >
               <option value="">Tüm sûreler</option>
               {surahs.map((s) => (
@@ -111,7 +111,7 @@ export function PanelView({
             <select
               value={filterTafsir}
               onChange={(e) => setFilterTafsir(e.target.value)}
-              className="w-full border rounded-lg px-2 py-1.5 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
+              className="w-full border rounded-lg px-2 py-1.5 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
             >
               <option value="">Tüm tefsirler</option>
               {tafsirs.map((t) => (
@@ -126,7 +126,7 @@ export function PanelView({
             <select
               value={filterKind}
               onChange={(e) => setFilterKind(e.target.value as "all" | "highlight" | "note")}
-              className="w-full border rounded-lg px-2 py-1.5 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
+              className="w-full border rounded-lg px-2 py-1.5 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
             >
               <option value="all">Hepsi</option>
               <option value="highlight">Sadece vurgular</option>

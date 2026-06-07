@@ -7,6 +7,20 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-07 (11. iş) — Açılır menü arka plan şeffaflığı düzeltmesi
+
+Kullanıcı: "açılır menülerde arkası görünüyor".
+
+**Sorun:** 10. iş sırasında yapılan glassmorphism tasarım yenilemesinde bazı form elementleri ve açılır menüler yarı saydam arka plan aldı (`bg-white/70`, `bg-white/90`, vb.). Bu elementlerin altındaki sayfa içeriği ve ambient ışıma gradyanı görünüyordu.
+
+**Düzeltilen yerler:**
+- `TopBar.tsx`: Mobil hamburger menüsü `bg-white/90 dark:bg-stone-900/90` + `backdrop-blur-md` → `bg-white dark:bg-stone-900` (tam opak)
+- `SurahIndexView.tsx`: Arama input + 2 `<select>` `bg-white/70 dark:bg-stone-900/60` → `bg-white dark:bg-stone-900`
+- `PanelView.tsx`: 3 `<select>` filtre `bg-white/70 dark:bg-stone-800/70` → `bg-white dark:bg-stone-800`
+- `arama/page.tsx`: 3 input `bg-white/70 dark:bg-stone-900/60` → `bg-white dark:bg-stone-900`
+
+**tsc temiz.** Kart/panel yüzeyleri (surface-glass) tasarım kararı olarak yarı saydam kalmaya devam etti.
+
 ### 2026-06-07 (10. iş) — Efektli/modern tasarım yenilemesi (yalnız görsel)
 
 Kullanıcı, paylaştığı koyu zeminli "proje yönetim paneli" görsellerindeki gibi **modern ve efektli** bir tasarım istedi — **içerik/fonksiyon hiç değişmeden**, yalnız görsel. Kararlar (kullanıcıyla): kapsam = tüm site, tema = her ikisi de korunur (koyuda tam efekt, açıkta yumuşatılmış), okuyucu = ölçülü efekt (çevre camlı, metin alanı sade/kontrastlı).
