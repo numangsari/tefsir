@@ -58,7 +58,7 @@ export default async function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-stone-50 dark:bg-stone-950">
+    <div className="min-h-screen flex flex-col">
       <TopBar
         userName={user?.name ?? user?.email ?? undefined}
         role={role}
@@ -67,49 +67,40 @@ export default async function Home() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="bg-emerald-800 dark:bg-emerald-950 text-emerald-50">
-          <div className="mx-auto max-w-4xl px-4 py-16 md:py-24 text-center">
+        <section className="relative overflow-hidden">
+          <div className="mx-auto max-w-4xl px-4 py-16 md:py-24 text-center animate-fade-up">
             <div className="flex items-center justify-center gap-3 mb-7">
-              <BrandMark className="h-14 w-14 shrink-0" />
+              <BrandMark className="h-14 w-14 shrink-0 drop-shadow-[0_4px_20px_rgba(16,185,129,0.45)]" />
               <span className="font-serif text-4xl md:text-5xl font-bold tracking-tight leading-none">
-                <span className="text-white">tefsir</span>
-                <span className="text-amber-300">.net</span>
+                <span className="text-stone-800 dark:text-white">tefsir</span>
+                <span className="text-emerald-600 dark:text-amber-300">.net</span>
               </span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-serif font-bold tracking-tight">
+            <h1 className="text-3xl md:text-5xl font-serif font-bold tracking-tight text-stone-800 dark:text-stone-50">
               Kur&apos;an-ı Kerim&apos;i{" "}
-              <span className="text-amber-300">11 klasik tefsir</span> ile okuyun
+              <span className="text-emerald-600 dark:text-amber-300">11 klasik tefsir</span> ile okuyun
             </h1>
-            <p className="mt-5 text-base md:text-lg text-emerald-100/90 max-w-2xl mx-auto leading-relaxed">
+            <p className="mt-5 text-base md:text-lg text-stone-600 dark:text-stone-300 max-w-2xl mx-auto leading-relaxed">
               Taberî&apos;den Kurtubî&apos;ye, Fahreddin Râzî&apos;den İbn Kesîr&apos;e — klasik
               tefsirleri ayet ayet, günümüz Türkçesine sadeleştirilmiş ve anlaşılır biçimde
               okuyun. Kelime kelime meal, vurgulama ve not alma ile anlayarak okuma.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Link
-                href="/oku"
-                className="px-6 py-3 rounded-md bg-amber-400 text-emerald-950 font-semibold hover:bg-amber-300 transition-colors"
-              >
+              <Link href="/oku" className="px-6 py-3 btn-glow">
                 Tefsir Oku
               </Link>
               {isGuest ? (
-                <Link
-                  href="/giris?tab=kayit"
-                  className="px-6 py-3 rounded-md border border-emerald-300/40 text-emerald-50 font-medium hover:bg-emerald-700 transition-colors"
-                >
+                <Link href="/giris?tab=kayit" className="px-6 py-3 btn-outline-glow">
                   Ücretsiz üye ol
                 </Link>
               ) : (
-                <Link
-                  href="/panel"
-                  className="px-6 py-3 rounded-md border border-emerald-300/40 text-emerald-50 font-medium hover:bg-emerald-700 transition-colors"
-                >
+                <Link href="/panel" className="px-6 py-3 btn-outline-glow">
                   Notlarım
                 </Link>
               )}
             </div>
-            <p className="mt-4 text-sm text-emerald-200/70">
+            <p className="mt-4 text-sm text-stone-500 dark:text-stone-400">
               Üye olmadan da okuyabilirsiniz; not ve vurgu için ücretsiz hesap oluşturun.
             </p>
           </div>
@@ -125,11 +116,11 @@ export default async function Home() {
               <Link
                 key={f.title}
                 href={f.href}
-                className="group rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5 hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-sm transition-all"
+                className="group surface-glass surface-glass-hover p-5 animate-fade-up"
               >
                 <div className="flex items-start gap-3">
                   <span
-                    className="shrink-0 grid place-items-center w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-lg"
+                    className="shrink-0 grid place-items-center w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-lg shadow-[0_0_18px_-6px_rgba(16,185,129,0.5)]"
                     aria-hidden
                   >
                     {f.icon}
@@ -140,7 +131,7 @@ export default async function Home() {
                         {f.title}
                       </h3>
                       {f.guestNote && (
-                        <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 shadow-[0_0_12px_-3px_rgba(245,158,11,0.5)]">
                           {f.guestNote}
                         </span>
                       )}
@@ -157,7 +148,7 @@ export default async function Home() {
 
         {/* Nasıl çalışır / iletişim */}
         <section className="mx-auto max-w-4xl px-4 pb-16">
-          <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/40 p-6 md:p-8 text-center">
+          <div className="surface-glass p-6 md:p-8 text-center">
             <h2 className="text-lg md:text-xl font-semibold text-emerald-800 dark:text-emerald-200">
               Bir sorunuz ya da öneriniz mi var?
             </h2>
@@ -165,17 +156,14 @@ export default async function Home() {
               Görüş, öneri ve hata bildirimleriniz için bize ulaşabilirsiniz. Her geri bildirim
               siteyi daha iyi hale getirmemize yardımcı olur.
             </p>
-            <Link
-              href="/iletisim"
-              className="inline-block mt-5 px-5 py-2.5 rounded-md bg-emerald-700 text-white font-medium hover:bg-emerald-600 transition-colors"
-            >
+            <Link href="/iletisim" className="inline-flex mt-5 px-5 py-2.5 btn-glow">
               İletişime geç
             </Link>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-stone-200 dark:border-stone-800 py-6">
+      <footer className="border-t border-stone-200/70 dark:border-white/10 py-6">
         <div className="mx-auto max-w-4xl px-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-stone-500 dark:text-stone-400">
           <Link href="/oku" className="hover:text-emerald-700 dark:hover:text-emerald-300">
             Tefsir Oku

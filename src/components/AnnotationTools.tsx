@@ -31,7 +31,7 @@ export function AnnotationTools({
   return (
     <div className="space-y-3">
       {/* Üst kısım — aktif seçim varsa altını çiz / not ekle */}
-      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3">
+      <section className="surface-glass !rounded-xl p-3">
         <h3 className="text-xs uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2">
           Altını Çiz / Not Ekle
         </h3>
@@ -42,13 +42,13 @@ export function AnnotationTools({
             </div>
             <button
               onClick={() => onHighlight("green")}
-              className="w-full px-3 py-1.5 text-sm bg-emerald-700 hover:bg-emerald-600 text-white rounded mb-2"
+              className="w-full px-3 py-1.5 text-sm btn-glow mb-2"
             >
               Seçili metnin altını çiz
             </button>
             <button
               onClick={onAddNote}
-              className="w-full px-3 py-1.5 text-sm bg-amber-600 hover:bg-amber-500 text-white rounded"
+              className="w-full px-3 py-1.5 text-sm inline-flex items-center justify-center gap-1.5 rounded-full bg-amber-600 hover:bg-amber-500 text-white font-medium border border-amber-500/50 shadow-[0_6px_18px_-8px_rgba(245,158,11,0.6)] transition-colors"
             >
               ✎ Bu seçime not ekle
             </button>
@@ -62,7 +62,7 @@ export function AnnotationTools({
       </section>
 
       {/* Vurgular listesi */}
-      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3">
+      <section className="surface-glass !rounded-xl p-3">
         <h3 className="text-xs uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2">
           Bu tefsirdeki vurgularım ({highlights.length})
         </h3>
@@ -97,7 +97,7 @@ export function AnnotationTools({
       </section>
 
       {/* Notlar listesi */}
-      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3">
+      <section className="surface-glass !rounded-xl p-3">
         <h3 className="text-xs uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2">
           Bu tefsirdeki notlarım ({notes.length})
         </h3>

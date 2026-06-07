@@ -4,6 +4,8 @@
 
 :root {
   color-scheme: light;
+  /* Zarif serif başlık fontu (layout'ta <link> ile yüklenir) */
+  --font-serif: "Newsreader", Georgia, Cambria, "Times New Roman", serif;
 }
 .dark {
   color-scheme: dark;
@@ -14,12 +16,31 @@ html, body {
 }
 
 body {
-  background: #fafaf9; /* stone-50 */
+  background: #f6f6f4; /* hafif sıcak taş — açık tema tabanı */
   color: #1c1917;     /* stone-900 */
 }
 .dark body {
-  background: #0c0a09; /* stone-950 */
+  background: #0a0a0a; /* near-black — koyu efektli taban */
   color: #e7e5e4;     /* stone-200 */
+}
+
+/* Ambient ışıma katmanı — emerald/teal radyal gradyanlar (yalnız görsel) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55rem 38rem at 8% -12%, rgba(16, 185, 129, 0.10), transparent 60%),
+    radial-gradient(48rem 36rem at 100% 0%, rgba(13, 148, 136, 0.06), transparent 55%),
+    radial-gradient(40rem 30rem at 50% 118%, rgba(5, 150, 105, 0.05), transparent 60%);
+}
+.dark body::before {
+  background:
+    radial-gradient(58rem 40rem at 8% -12%, rgba(16, 185, 129, 0.20), transparent 60%),
+    radial-gradient(50rem 40rem at 102% -4%, rgba(20, 184, 166, 0.12), transparent 55%),
+    radial-gradient(44rem 32rem at 50% 120%, rgba(5, 150, 105, 0.10), transparent 60%);
 }
 
 .arabic {
@@ -88,6 +109,118 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 .animate-toast { animation: toast-in 200ms ease-out; }
+
+/* ── Efektli tasarım katmanı: yeniden kullanılabilir yüzey/buton/rozet sınıfları ── */
+@layer components {
+  /* Camlı yüzey (kart/panel) */
+  .surface-glass {
+    border-radius: 1rem;
+    border: 1px solid rgba(120, 113, 108, 0.18);
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 10px 30px -16px rgba(15, 23, 42, 0.25);
+  }
+  .dark .surface-glass {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(23, 23, 23, 0.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 14px 44px -18px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Tıklanabilir camlı yüzeyler için hover ışıması */
+  .surface-glass-hover {
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  }
+  .surface-glass-hover:hover {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow:
+      0 0 0 1px rgba(16, 185, 129, 0.18),
+      0 18px 48px -20px rgba(16, 185, 129, 0.28);
+  }
+
+  /* Primary pill buton — emerald gradyan + glow */
+  .btn-glow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    background-image: linear-gradient(135deg, #059669, #047857);
+    color: #ecfdf5;
+    font-weight: 600;
+    border: 1px solid rgba(16, 185, 129, 0.5);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 8px 24px -10px rgba(16, 185, 129, 0.55);
+    transition: filter 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  }
+  .btn-glow:hover {
+    filter: brightness(1.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      0 12px 30px -8px rgba(16, 185, 129, 0.7);
+  }
+  .btn-glow:active { transform: translateY(1px); }
+
+  /* İkincil saydam pill buton */
+  .btn-outline-glow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.4);
+    color: #047857;
+    font-weight: 500;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+  }
+  .btn-outline-glow:hover {
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.15), 0 10px 26px -14px rgba(16, 185, 129, 0.4);
+  }
+  .dark .btn-outline-glow {
+    background: rgba(255, 255, 255, 0.04);
+    color: #6ee7b7;
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+
+  /* Parlayan rozet */
+  .badge-glow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border-radius: 9999px;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #047857;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 14px -4px rgba(16, 185, 129, 0.5);
+  }
+  .dark .badge-glow {
+    color: #6ee7b7;
+    background: rgba(16, 185, 129, 0.16);
+    border-color: rgba(16, 185, 129, 0.35);
+  }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 400ms ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up { animation: none; }
+}
 
 /* Yazdır görünümünde tema bağımsız beyaz */
 @media print {

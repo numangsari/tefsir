@@ -42,7 +42,7 @@ export function AuthUnified({ defaultTab = "giris" }: { defaultTab?: AuthTab }) 
 
   return (
     <main className="min-h-[100dvh] grid grid-cols-1 md:grid-cols-2">
-      <section className="bg-emerald-700 dark:bg-emerald-950 text-emerald-50 p-8 md:p-12 flex flex-col overflow-y-auto">
+      <section className="relative bg-gradient-to-br from-emerald-700 to-emerald-900 dark:from-emerald-950 dark:to-black text-emerald-50 p-8 md:p-12 flex flex-col overflow-y-auto">
         <div className="max-w-md mx-auto w-full my-auto">
           {ayah ? (
             <>
@@ -58,9 +58,9 @@ export function AuthUnified({ defaultTab = "giris" }: { defaultTab?: AuthTab }) 
         </div>
       </section>
 
-      <section className="p-8 md:p-12 flex flex-col justify-center bg-stone-50 dark:bg-stone-950">
-        <div className="max-w-sm mx-auto w-full">
-          <h1 className="text-3xl font-semibold text-emerald-700 dark:text-emerald-300 mb-1">
+      <section className="p-6 md:p-12 flex flex-col justify-center">
+        <div className="max-w-sm mx-auto w-full surface-glass p-6 md:p-8 animate-fade-up">
+          <h1 className="text-3xl font-serif font-semibold text-emerald-700 dark:text-emerald-300 mb-1">
             tefsir.net
           </h1>
           <p className="text-stone-500 dark:text-stone-400 text-sm mb-6">
@@ -70,20 +70,20 @@ export function AuthUnified({ defaultTab = "giris" }: { defaultTab?: AuthTab }) 
           <div className="grid grid-cols-2 gap-2 mb-6">
             <button
               onClick={() => setTab("giris")}
-              className={`py-2 text-sm rounded border ${
+              className={`py-2 text-sm rounded-full border transition ${
                 tab === "giris"
-                  ? "bg-emerald-700 text-white border-emerald-700"
-                  : "border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300"
+                  ? "btn-glow"
+                  : "border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-emerald-400"
               }`}
             >
               Giriş
             </button>
             <button
               onClick={() => setTab("kayit")}
-              className={`py-2 text-sm rounded border ${
+              className={`py-2 text-sm rounded-full border transition ${
                 tab === "kayit"
-                  ? "bg-emerald-700 text-white border-emerald-700"
-                  : "border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300"
+                  ? "btn-glow"
+                  : "border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-emerald-400"
               }`}
             >
               Kayıt
@@ -92,7 +92,7 @@ export function AuthUnified({ defaultTab = "giris" }: { defaultTab?: AuthTab }) 
 
           {tab === "giris" ? <LoginForm /> : <RegisterForm />}
 
-          <div className="mt-6 pt-5 border-t border-stone-200 dark:border-stone-800 text-center">
+          <div className="mt-6 pt-5 border-t border-stone-200/70 dark:border-white/10 text-center">
             <Link
               href="/oku"
               className="text-sm text-stone-600 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-emerald-400"
@@ -147,7 +147,7 @@ function LoginForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded-md px-3 py-2 bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700"
+          className="w-full border rounded-lg px-3 py-2 bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         />
       </div>
       <div>
@@ -165,14 +165,14 @@ function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded-md px-3 py-2 bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700"
+          className="w-full border rounded-lg px-3 py-2 bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         />
       </div>
       {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-emerald-700 text-white py-2.5 rounded-md hover:bg-emerald-800 disabled:opacity-60"
+        className="w-full btn-glow py-2.5 disabled:opacity-60"
       >
         {loading ? "Giriliyor..." : "Giriş yap"}
       </button>
@@ -238,7 +238,7 @@ function RegisterForm() {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full border rounded-md px-3 py-2 bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700"
+          className="w-full border rounded-lg px-3 py-2 bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         />
       </div>
       <div>
@@ -248,7 +248,7 @@ function RegisterForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded-md px-3 py-2 bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700"
+          className="w-full border rounded-lg px-3 py-2 bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         />
       </div>
       <div>
@@ -259,7 +259,7 @@ function RegisterForm() {
           minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded-md px-3 py-2 bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700"
+          className="w-full border rounded-lg px-3 py-2 bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         />
       </div>
       <div>
@@ -270,10 +270,10 @@ function RegisterForm() {
           minLength={8}
           value={password2}
           onChange={(e) => setPassword2(e.target.value)}
-          className={`w-full border rounded-md px-3 py-2 bg-white dark:bg-stone-900 ${
+          className={`w-full border rounded-lg px-3 py-2 bg-white/70 dark:bg-stone-900/60 focus:ring-2 focus:ring-emerald-500/20 outline-none transition ${
             password2 && password !== password2
               ? "border-red-500 dark:border-red-400"
-              : "border-stone-300 dark:border-stone-700"
+              : "border-stone-300 dark:border-stone-700 focus:border-emerald-500"
           }`}
         />
       </div>
@@ -281,7 +281,7 @@ function RegisterForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-emerald-700 text-white py-2.5 rounded-md hover:bg-emerald-800 disabled:opacity-60"
+        className="w-full btn-glow py-2.5 disabled:opacity-60"
       >
         {loading ? "Kaydediliyor..." : "Kayıt ol"}
       </button>

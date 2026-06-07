@@ -43,7 +43,7 @@ export function SurahIndexView({ surahs }: { surahs: Surah[] }) {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
-      <h1 className="text-2xl font-semibold text-emerald-700 dark:text-emerald-300 mb-1">
+      <h1 className="text-2xl font-serif font-semibold text-emerald-700 dark:text-emerald-300 mb-1">
         Sûreler
       </h1>
       <p className="text-sm text-stone-500 dark:text-stone-400 mb-5">
@@ -56,12 +56,12 @@ export function SurahIndexView({ surahs }: { surahs: Surah[] }) {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Sûre adı, numarası veya anlamı ile ara..."
-          className="border rounded px-3 py-2 text-sm bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700"
+          className="border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         />
         <select
           value={type}
           onChange={(e) => setType(e.target.value as "all" | "mekki" | "medeni")}
-          className="border rounded px-3 py-2 text-sm bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700"
+          className="border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         >
           <option value="all">Tümü</option>
           <option value="mekki">Mekkî</option>
@@ -70,7 +70,7 @@ export function SurahIndexView({ surahs }: { surahs: Surah[] }) {
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as SortKey)}
-          className="border rounded px-3 py-2 text-sm bg-white dark:bg-stone-900 border-stone-300 dark:border-stone-700"
+          className="border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         >
           <option value="mushaf">Mushaf sırası</option>
           <option value="revelation">Nüzul sırası</option>
@@ -84,7 +84,7 @@ export function SurahIndexView({ surahs }: { surahs: Surah[] }) {
           <li key={s.id}>
             <Link
               href={`/oku/${s.id}/1`}
-              className="block rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3 hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-sm transition"
+              className="block surface-glass surface-glass-hover !rounded-xl p-3"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">

@@ -54,7 +54,7 @@ export function ContactForm({
 
   if (sent) {
     return (
-      <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/20 p-6 text-center">
+      <div className="surface-glass p-6 text-center">
         <div className="text-3xl mb-2" aria-hidden>
           ✓
         </div>
@@ -67,14 +67,11 @@ export function ContactForm({
         <div className="mt-4 flex items-center justify-center gap-3">
           <button
             onClick={() => setSent(false)}
-            className="px-4 py-2 text-sm rounded-md border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40"
+            className="px-4 py-2 text-sm btn-outline-glow"
           >
             Yeni mesaj gönder
           </button>
-          <Link
-            href="/oku"
-            className="px-4 py-2 text-sm rounded-md bg-emerald-700 text-white hover:bg-emerald-600"
-          >
+          <Link href="/oku" className="px-4 py-2 text-sm btn-glow">
             Tefsir Oku
           </Link>
         </div>
@@ -149,7 +146,7 @@ export function ContactForm({
       <button
         type="submit"
         disabled={submitting}
-        className="w-full sm:w-auto px-6 py-2.5 rounded-md bg-emerald-700 text-white font-medium hover:bg-emerald-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+        className="w-full sm:w-auto px-6 py-2.5 btn-glow disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {submitting ? "Gönderiliyor…" : "Mesajı Gönder"}
       </button>
@@ -158,7 +155,7 @@ export function ContactForm({
 }
 
 const inputCls =
-  "w-full rounded-md border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2 text-sm text-stone-800 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500";
+  "w-full rounded-lg border border-stone-300 dark:border-stone-700 bg-white/70 dark:bg-stone-900/60 px-3 py-2 text-sm text-stone-800 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition";
 
 function Field({
   label,

@@ -5,10 +5,10 @@
 export function BrandLogo({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
-      <BrandMark className="h-7 w-7 shrink-0" />
+      <BrandMark className="h-7 w-7 shrink-0 drop-shadow-[0_2px_8px_rgba(16,185,129,0.35)]" />
       <span className="font-serif text-lg font-bold leading-none tracking-tight">
-        <span className="text-white">tefsir</span>
-        <span className="text-amber-300">.net</span>
+        <span className="text-stone-800 dark:text-white">tefsir</span>
+        <span className="text-emerald-600 dark:text-amber-300">.net</span>
       </span>
     </span>
   );

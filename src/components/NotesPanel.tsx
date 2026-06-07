@@ -76,7 +76,7 @@ export function NotesPanel({
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4 text-emerald-700 dark:text-emerald-300">
+      <h3 className="text-lg font-serif font-semibold mb-4 text-emerald-700 dark:text-emerald-300">
         {surahName} {ayahNo}. ayet — Vurgu ve Notlarım ({items.length})
       </h3>
       <div className="space-y-6">
@@ -95,7 +95,7 @@ export function NotesPanel({
               {g.items.map((it) => (
                 <li
                   key={`${it.kind}-${it.id}`}
-                  className="border border-stone-200 dark:border-stone-700 rounded-md p-3 bg-stone-50 dark:bg-stone-900 text-sm"
+                  className="surface-glass !rounded-xl p-3 text-sm"
                 >
                   {it.kind === "highlight" ? (
                     <div>

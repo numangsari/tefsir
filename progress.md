@@ -7,6 +7,19 @@
 
 ## 📅 Revizyon Geçmişi
 
+### 2026-06-07 (10. iş) — Efektli/modern tasarım yenilemesi (yalnız görsel)
+
+Kullanıcı, paylaştığı koyu zeminli "proje yönetim paneli" görsellerindeki gibi **modern ve efektli** bir tasarım istedi — **içerik/fonksiyon hiç değişmeden**, yalnız görsel. Kararlar (kullanıcıyla): kapsam = tüm site, tema = her ikisi de korunur (koyuda tam efekt, açıkta yumuşatılmış), okuyucu = ölçülü efekt (çevre camlı, metin alanı sade/kontrastlı).
+
+**Yaklaşım — merkezi tasarım katmanı (komponent bazlı değil):**
+- `globals.css`: (1) **ambient ışıma arka planı** — `body::before` ile emerald/teal radyal gradyanlar (koyuda güçlü, açıkta düşük opaklık), koyu taban `#0a0a0a`; (2) `@layer components` yeniden kullanılabilir sınıflar: `.surface-glass` (cam yüzey: backdrop-blur + yarı saydam + iç/dış gölge), `.surface-glass-hover` (emerald hover glow), `.btn-glow` (emerald gradyan pill + glow), `.btn-outline-glow` (saydam pill), `.badge-glow`; (3) `animate-fade-up` + reduced-motion. Mevcut `.hl/.note-inline/.arabic/.tefsir-body/toast` **birebir korundu**.
+- `tailwind.config.ts`: `fontFamily.serif = [var(--font-serif), ...]` (tüm `font-serif` kullanımları tek hamlede yükseldi), `boxShadow.glow/glow-lg`, `fade-up` keyframe/animation.
+- `layout.tsx` + `globals.css`: zarif serif font **Newsreader** — `next/font` yerine mevcut Amiri gibi `<link>` ile runtime'da yüklendi (build-time ağ bağımlılığı yok), `:root --font-serif` ile bağlandı.
+
+**Uygulama (sınıf swap'ı, fonksiyon dokunulmadı):** TopBar (opak yeşil bar → her iki temada okunur cam header), BrandLogo (adaptif metin + glow), page.tsx (hero ambient + serif + glow CTA + cam kartlar + cam iletişim), AuthUnified (cam form + glow butonlar + gradyan sol panel), ContactForm, okuyucu — AyahStickyHeader/TafsirReader (paneller cam, **orta metin paneli yüksek kontrastlı**, "Sıradaki"/NoteEditor glow)/AnnotationTools/BookmarkButton/FontSizeControl/NotesPanel/SearchPalette/ScrollToTopButton, yonetici/ui.tsx (Card/StatCard cam → tüm sekmeler), profil/panel/sureler/arama sayfaları (kartlar cam, inputlar/butonlar modern; kırmızı "Hesabı sil" korundu).
+
+**Doğrulama:** `tsc --noEmit` temiz, `npm run build` temiz. Dev'de (port 3001) `/`, `/oku/2/6`, `/giris`, `/iletisim` 200 + yeni sınıflar render, `tefsir-body` korunmuş, log'da hata yok. Tarayıcıda gözle (özellikle iki tema + mobil) kullanıcı kontrolü kaldı.
+
 ### 2026-06-06 (9. iş) — Ana sayfa güncellemeleri + okuma ilerlemesi
 
 Kullanıcı ana sayfa ve birkaç UI iyileştirmesi istedi (ekran görüntüsüyle).

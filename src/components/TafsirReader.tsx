@@ -412,7 +412,7 @@ export function TafsirReader({
                     ? "bg-emerald-700 border-emerald-700 shadow-sm"
                     : isRead
                     ? "bg-emerald-50/90 dark:bg-emerald-950/25 border-emerald-200 dark:border-emerald-800"
-                    : "bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-700"
+                    : "bg-white/60 dark:bg-stone-900/50 backdrop-blur-sm border-stone-200/70 dark:border-white/10 hover:border-emerald-400/60"
                 }`}
               >
                 <button
@@ -492,7 +492,7 @@ export function TafsirReader({
       <main
         className={`${
           mobilePane === "text" ? "block" : "hidden"
-        } md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-md p-4 sm:p-6 min-h-[60vh] transition-shadow ${
+        } md:block bg-white/85 dark:bg-stone-900/70 backdrop-blur-md border border-stone-200/70 dark:border-white/10 rounded-2xl p-4 sm:p-6 min-h-[60vh] shadow-[0_12px_44px_-22px_rgba(0,0,0,0.5)] transition-shadow ${
           flashTafsirRing ? "ring-2 ring-amber-500" : ""
         }`}
       >
@@ -558,7 +558,7 @@ export function TafsirReader({
             <button
               type="button"
               onClick={handleSiradaki}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-700 px-4 py-3 text-sm font-medium text-white shadow-sm hover:bg-emerald-800 transition-colors"
+              className="w-full btn-glow px-4 py-3 text-sm"
             >
               {tafsirs.findIndex((t) => t.id === selectedId) === tafsirs.length - 1
                 ? "Sıradaki ayet"
@@ -594,7 +594,7 @@ export function TafsirReader({
             <button
               type="button"
               onClick={handleSiradaki}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-800 transition-colors"
+              className="w-full btn-glow px-4 py-2.5 text-sm"
             >
               {tafsirs.findIndex((t) => t.id === selectedId) === tafsirs.length - 1
                 ? "Sıradaki ayet"
@@ -637,7 +637,7 @@ export function TafsirReader({
       )}
 
       {/* Mobil alt sekme çubuğu — Tefsirler / Metin / Araçlar */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-20 flex border-t border-stone-200 dark:border-stone-800 bg-white/95 dark:bg-stone-950/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-20 flex border-t border-stone-200/70 dark:border-white/10 bg-white/90 dark:bg-stone-950/90 backdrop-blur-md pb-[env(safe-area-inset-bottom)]">
         {(
           [
             { key: "list", label: "Tefsirler", icon: "☰" },
@@ -708,9 +708,9 @@ function NoteEditor({
   const showHideToggle = onToggleHidden != null || onHideOnSaveChange != null;
   const isHidden = onToggleHidden != null ? hidden : hideOnSave;
   return (
-    <div className="fixed inset-0 z-40 bg-black/40 grid place-items-center p-4" onClick={onCancel}>
+    <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm grid place-items-center p-4" onClick={onCancel}>
       <div
-        className="bg-white dark:bg-stone-900 rounded-lg shadow-xl w-full max-w-lg p-5 border border-stone-200 dark:border-stone-700"
+        className="surface-glass shadow-glow-lg w-full max-w-lg p-5 animate-fade-up"
         onClick={(e) => e.stopPropagation()}
       >
         <h4 className="font-semibold mb-2 text-stone-800 dark:text-stone-100">{title}</h4>
@@ -721,7 +721,7 @@ function NoteEditor({
           value={body}
           onChange={(e) => setBody(e.target.value)}
           rows={5}
-          className="w-full border rounded-md px-3 py-2 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
+          className="w-full border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
           placeholder="Notunuzu yazın..."
           autoFocus
         />
@@ -761,14 +761,14 @@ function NoteEditor({
           <div className="flex gap-2">
             <button
               onClick={onCancel}
-              className="px-3 py-1.5 text-sm rounded border border-stone-300 dark:border-stone-700"
+              className="px-4 py-1.5 text-sm btn-outline-glow"
             >
               İptal
             </button>
             <button
               onClick={() => onSave(body.trim())}
               disabled={!body.trim()}
-              className="px-3 py-1.5 text-sm rounded bg-emerald-700 text-white disabled:opacity-50 hover:bg-emerald-800"
+              className="px-4 py-1.5 text-sm btn-glow disabled:opacity-50"
             >
               Kaydet
             </button>

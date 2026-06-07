@@ -25,7 +25,7 @@ export default function YoneticiPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
-      <h1 className="text-2xl font-semibold text-amber-700 dark:text-amber-300 mb-6">
+      <h1 className="text-2xl font-serif font-semibold text-amber-700 dark:text-amber-300 mb-6">
         Yönetici Paneli
       </h1>
 

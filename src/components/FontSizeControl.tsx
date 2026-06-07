@@ -39,16 +39,16 @@ export function FontSizeControl() {
   }
 
   return (
-    <div className="inline-flex items-center gap-0.5 rounded border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 p-0.5">
+    <div className="inline-flex items-center gap-0.5 rounded-full border border-stone-300/70 dark:border-white/10 bg-white/60 dark:bg-stone-900/50 backdrop-blur-sm p-0.5">
       {STEPS.map((s) => (
         <button
           key={s.key}
           onClick={() => pick(s.key)}
           title={s.title}
-          className={`px-2 py-0.5 text-xs rounded ${
+          className={`px-2 py-0.5 text-xs rounded-full transition-colors ${
             size === s.key
-              ? "bg-emerald-700 text-white"
-              : "text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
+              ? "bg-emerald-600 text-white shadow-[0_4px_12px_-4px_rgba(16,185,129,0.6)]"
+              : "text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-white/10"
           }`}
         >
           {s.label}

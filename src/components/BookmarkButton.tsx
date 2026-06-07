@@ -133,8 +133,8 @@ export function BookmarkButton({
         compact ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm"
       } ${loading ? "cursor-wait opacity-80" : "cursor-pointer"} ${
         isHere
-          ? "bg-amber-600 text-white border-amber-600 shadow-sm hover:bg-amber-700"
-          : "bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-600 text-stone-700 dark:text-stone-200 hover:border-amber-400 hover:text-amber-800 dark:hover:text-amber-200"
+          ? "bg-amber-600 text-white border-amber-600 shadow-[0_6px_18px_-8px_rgba(245,158,11,0.7)] hover:bg-amber-700"
+          : "bg-white/60 dark:bg-stone-900/50 backdrop-blur-sm border-stone-200/70 dark:border-white/10 text-stone-700 dark:text-stone-200 hover:border-amber-400 hover:text-amber-800 dark:hover:text-amber-200"
       }`}
     >
       <span className="text-sm leading-none" aria-hidden>

@@ -146,12 +146,12 @@ export default function ProfilePage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8 space-y-6">
-      <h1 className="text-2xl font-semibold text-emerald-700 dark:text-emerald-300">
+      <h1 className="text-2xl font-serif font-semibold text-emerald-700 dark:text-emerald-300">
         Hesabım
       </h1>
 
       {/* Özet */}
-      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+      <section className="surface-glass !rounded-xl p-5">
         <dl className="grid grid-cols-2 gap-y-2 text-sm">
           <dt className="text-stone-500 dark:text-stone-400">E-posta</dt>
           <dd>{p.email}</dd>
@@ -165,7 +165,7 @@ export default function ProfilePage() {
       </section>
 
       {/* Okuma ilerlemesi */}
-      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+      <section className="surface-glass !rounded-xl p-5">
         <h2 className="font-medium mb-1 text-stone-800 dark:text-stone-100">
           Okuma ilerlemesi
         </h2>
@@ -215,19 +215,19 @@ export default function ProfilePage() {
       </section>
 
       {/* İsim */}
-      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+      <section className="surface-glass !rounded-xl p-5">
         <h2 className="font-medium mb-3 text-stone-800 dark:text-stone-100">İsim</h2>
         <form onSubmit={saveName} className="flex gap-2 items-end">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="İsminiz"
-            className="flex-1 border rounded px-3 py-2 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
+            className="flex-1 border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
           />
           <button
             type="submit"
             disabled={saving || (name.trim() === (p.name ?? "").trim())}
-            className="px-4 py-2 text-sm rounded bg-emerald-700 text-white disabled:opacity-50 hover:bg-emerald-800"
+            className="px-4 py-2 text-sm btn-glow disabled:opacity-50"
           >
             {saving ? "..." : "Kaydet"}
           </button>
@@ -235,7 +235,7 @@ export default function ProfilePage() {
       </section>
 
       {/* Şifre */}
-      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+      <section className="surface-glass !rounded-xl p-5">
         <h2 className="font-medium mb-3 text-stone-800 dark:text-stone-100">Şifre değiştir</h2>
         <form onSubmit={changePassword} className="space-y-3 max-w-sm">
           <input
@@ -244,7 +244,7 @@ export default function ProfilePage() {
             onChange={(e) => setCurr(e.target.value)}
             placeholder="Mevcut şifre"
             required
-            className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
+            className="w-full border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
           />
           <input
             type="password"
@@ -253,7 +253,7 @@ export default function ProfilePage() {
             placeholder="Yeni şifre (en az 8)"
             required
             minLength={8}
-            className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
+            className="w-full border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
           />
           <input
             type="password"
@@ -262,13 +262,13 @@ export default function ProfilePage() {
             placeholder="Yeni şifre (tekrar)"
             required
             minLength={8}
-            className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
+            className="w-full border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
           />
           {pwErr && <p className="text-sm text-red-700 dark:text-red-400">{pwErr}</p>}
           <button
             type="submit"
             disabled={pwLoading}
-            className="px-4 py-2 text-sm rounded bg-emerald-700 text-white disabled:opacity-50 hover:bg-emerald-800"
+            className="px-4 py-2 text-sm btn-glow disabled:opacity-50"
           >
             {pwLoading ? "..." : "Şifreyi güncelle"}
           </button>
@@ -276,12 +276,12 @@ export default function ProfilePage() {
       </section>
 
       {/* Çıkış */}
-      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5">
+      <section className="surface-glass !rounded-xl p-5">
         <h2 className="font-medium mb-3 text-stone-800 dark:text-stone-100">Oturum</h2>
         <button
           type="button"
           onClick={() => void signOutCompletely()}
-          className="px-4 py-2 text-sm rounded border border-stone-300 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800"
+          className="px-4 py-2 text-sm btn-outline-glow"
         >
           Çıkış yap
         </button>

@@ -80,13 +80,13 @@ export function PanelView({
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold text-emerald-700 dark:text-emerald-300">
+        <h1 className="text-2xl font-serif font-semibold text-emerald-700 dark:text-emerald-300">
           Notlarım
         </h1>
       </header>
 
       {/* Filtreler */}
-      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 mb-4">
+      <section className="surface-glass !rounded-xl p-4 mb-4">
         <h2 className="text-xs uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2">
           Filtreler
         </h2>
@@ -96,7 +96,7 @@ export function PanelView({
             <select
               value={filterSurah}
               onChange={(e) => setFilterSurah(e.target.value)}
-              className="w-full border rounded px-2 py-1.5 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
+              className="w-full border rounded-lg px-2 py-1.5 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
             >
               <option value="">Tüm sûreler</option>
               {surahs.map((s) => (
@@ -111,7 +111,7 @@ export function PanelView({
             <select
               value={filterTafsir}
               onChange={(e) => setFilterTafsir(e.target.value)}
-              className="w-full border rounded px-2 py-1.5 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
+              className="w-full border rounded-lg px-2 py-1.5 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
             >
               <option value="">Tüm tefsirler</option>
               {tafsirs.map((t) => (
@@ -126,7 +126,7 @@ export function PanelView({
             <select
               value={filterKind}
               onChange={(e) => setFilterKind(e.target.value as "all" | "highlight" | "note")}
-              className="w-full border rounded px-2 py-1.5 text-sm bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
+              className="w-full border rounded-lg px-2 py-1.5 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
             >
               <option value="all">Hepsi</option>
               <option value="highlight">Sadece vurgular</option>
@@ -138,7 +138,7 @@ export function PanelView({
               href={`/yazdir/panel?surahId=${filterSurah}&tafsirId=${filterTafsir}&kind=${filterKind}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 text-sm border border-stone-300 dark:border-stone-700 rounded hover:bg-stone-100 dark:hover:bg-stone-800"
+              className="px-3 py-1.5 text-sm btn-outline-glow"
             >
               PDF / Yazdır
             </a>
@@ -147,7 +147,7 @@ export function PanelView({
       </section>
 
       {/* Sonuçlar */}
-      <section className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+      <section className="surface-glass !rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-medium text-stone-700 dark:text-stone-300">
             {loading ? "Yükleniyor..." : `${visible.length} kayıt`}
@@ -164,7 +164,7 @@ export function PanelView({
           {visible.map((it) => (
             <li
               key={`${it.kind}-${it.id}`}
-              className="border border-stone-200 dark:border-stone-700 rounded-md p-3 bg-stone-50 dark:bg-stone-950/40"
+              className="surface-glass !rounded-xl p-3"
             >
               <div className="flex items-center justify-between text-xs text-stone-500 dark:text-stone-400 mb-1.5">
                 <div className="flex items-center gap-2 flex-wrap">

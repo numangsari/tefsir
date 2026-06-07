@@ -130,14 +130,14 @@ export function SearchPalette() {
 
   return (
     <div
-      className="fixed inset-0 z-[55] bg-black/40 flex items-start justify-center p-4 pt-20"
+      className="fixed inset-0 z-[55] bg-black/50 backdrop-blur-sm flex items-start justify-center p-4 pt-20"
       onClick={close}
     >
       <div
-        className="w-full max-w-2xl bg-white dark:bg-stone-900 rounded-lg shadow-2xl border border-stone-200 dark:border-stone-700 overflow-hidden"
+        className="w-full max-w-2xl surface-glass !rounded-2xl shadow-glow-lg overflow-hidden animate-fade-up"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center border-b border-stone-200 dark:border-stone-800 px-3">
+        <div className="flex items-center border-b border-stone-200/70 dark:border-white/10 px-3">
           <span className="text-stone-400">⌕</span>
           <input
             ref={inputRef}

@@ -17,7 +17,7 @@ export default async function IletisimPage() {
 
   return (
     <main className="mx-auto max-w-xl px-4 py-10">
-      <h1 className="text-2xl md:text-3xl font-semibold text-emerald-700 dark:text-emerald-300">
+      <h1 className="text-2xl md:text-3xl font-serif font-semibold text-emerald-700 dark:text-emerald-300">
         İletişim
       </h1>
       <p className="mt-2 text-stone-600 dark:text-stone-400 leading-relaxed">

@@ -17,7 +17,7 @@ export function Tabs<K extends string>({
   onChange: (k: K) => void;
 }) {
   return (
-    <div className="border-b border-stone-200 dark:border-stone-800 mb-6">
+    <div className="border-b border-stone-200/70 dark:border-white/10 mb-6">
       <nav className="flex gap-1 -mb-px overflow-x-auto" role="tablist">
         {tabs.map((t) => {
           const isActive = t.key === active;
@@ -52,7 +52,7 @@ export function StatCard({
   hint?: string;
 }) {
   return (
-    <div className="rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3">
+    <div className="surface-glass !rounded-xl p-3">
       <div className="text-xs uppercase tracking-wider text-stone-500 dark:text-stone-400">
         {label}
       </div>
@@ -123,9 +123,7 @@ export function Card({
   className?: string;
 }) {
   return (
-    <section
-      className={`rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 ${className}`}
-    >
+    <section className={`surface-glass !rounded-xl p-4 ${className}`}>
       {title && (
         <h2 className="text-sm font-medium mb-3 text-stone-700 dark:text-stone-300">
           {title}

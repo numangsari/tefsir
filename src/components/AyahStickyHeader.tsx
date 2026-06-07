@@ -96,14 +96,14 @@ export function AyahStickyHeader({
     <div
       id="ayah-sticky-header"
       ref={headerRef}
-      className={`sticky top-0 z-10 -mx-4 px-4 bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur border-b border-stone-200 dark:border-stone-800 transition-all ${
+      className={`sticky top-0 z-10 -mx-4 px-4 bg-stone-50/80 dark:bg-stone-950/80 backdrop-blur-md border-b border-stone-200/70 dark:border-white/10 transition-all ${
         compact ? "py-2" : "py-3"
       } ${flashRing && flash === "ayah" ? "ring-2 ring-amber-500 ring-inset" : ""}`}
     >
       {/* Başlık + meta rozetler */}
       <div className={`flex flex-wrap items-center gap-2 ${compact ? "mb-2" : "mb-3"}`}>
         <h2
-          className={`font-semibold text-emerald-800 dark:text-emerald-200 ${
+          className={`font-serif font-semibold text-emerald-800 dark:text-emerald-200 ${
             compact ? "text-sm" : "text-lg"
           }`}
         >
@@ -143,7 +143,7 @@ export function AyahStickyHeader({
 
       {/* Araç çubuğu: gezinme + eylemler */}
       <div
-        className={`rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-sm ${
+        className={`surface-glass !rounded-xl ${
           compact ? "p-1.5" : "p-2"
         } mb-3`}
       >
