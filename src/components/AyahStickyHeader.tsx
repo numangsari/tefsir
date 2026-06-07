@@ -143,7 +143,7 @@ export function AyahStickyHeader({
 
       {/* Araç çubuğu: gezinme + eylemler */}
       <div
-        className={`surface-glass !rounded-xl ${
+        className={`surface-glass !rounded-xl z-10 ${
           compact ? "p-1.5" : "p-2"
         } mb-3`}
       >
