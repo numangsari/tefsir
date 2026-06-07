@@ -193,7 +193,7 @@ export default function ProfilePage() {
 
       {/* Özet */}
       <section className="surface-glass !rounded-xl p-5">
-        <dl className="grid grid-cols-2 gap-y-2 text-sm">
+        <dl className="grid grid-cols-[auto_1fr] gap-y-2 text-sm">
           <dt className="text-stone-500 dark:text-stone-400">E-posta</dt>
           <dd>{p.email}</dd>
           <dt className="text-stone-500 dark:text-stone-400">Üyelik tarihi</dt>

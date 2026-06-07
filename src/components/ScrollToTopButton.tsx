@@ -32,7 +32,7 @@ export function ScrollToTopButton() {
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="En üste çık"
       title="En üste çık"
-      className="fixed bottom-20 md:bottom-6 left-4 md:left-6 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 to-emerald-800 text-white shadow-glow ring-1 ring-emerald-400/30 hover:brightness-110 transition"
+      className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 left-4 md:left-6 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 to-emerald-800 text-white shadow-glow ring-1 ring-emerald-400/30 hover:brightness-110 transition"
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
         <path

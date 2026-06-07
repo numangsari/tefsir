@@ -47,8 +47,17 @@ export function AyahArabicWithTooltip({
             {w.arabic}
             {showTip && (
               <span
+                ref={(el) => {
+                  if (!el) return;
+                  const rect = el.getBoundingClientRect();
+                  const vw = window.innerWidth;
+                  let shift = 0;
+                  if (rect.right > vw - 4) shift = vw - 4 - rect.right;
+                  if (rect.left + shift < 4) shift = 4 - rect.left;
+                  el.style.transform = `translateX(calc(-50% + ${shift}px))`;
+                }}
                 role="tooltip"
-                className="absolute top-full left-1/2 z-30 mt-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-stone-800 px-2.5 py-1 text-xs font-sans text-white shadow-lg dark:bg-stone-700 pointer-events-none"
+                className="absolute top-full left-1/2 z-30 mt-1.5 -translate-x-1/2 max-w-[9rem] whitespace-normal text-center rounded-md bg-stone-800 px-2.5 py-1 text-xs font-sans text-white shadow-lg dark:bg-stone-700 pointer-events-none"
               >
                 {w.tr}
                 <span className="absolute left-1/2 bottom-full -translate-x-1/2 border-4 border-transparent border-b-stone-800 dark:border-b-stone-700" />
