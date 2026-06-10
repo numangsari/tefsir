@@ -1,5 +1,69 @@
 # tefsirnet — İlerleme Arşivi
 
+### 2026-06-06 (8. iş) — Ana sayfa (tanıtım) + İletişim sayfası
+
+Kullanıcı iki yeni sayfa istedi: (1) sitenin genel tanıtımı olan, tefsir okuma/arama/notlar/hesabım'a yönlendiren bir **ana sayfa**; (2) kullanıcıların mesaj gönderebileceği bir **iletişim sayfası**.
+
+**Onaylanan kararlar:** (a) tanıtım herkese gösterilir (giriş yapan da görür); (b) iletişim mesajları hem Resend ile e-posta gelir hem de DB'ye kaydedilip yönetici panelinde okunur.
+
+**Uygulananlar:**
+1. **Ana sayfa tanıtıma çevrildi** (`src/app/page.tsx`): landing: hero (marka + "11 klasik tefsir ile okuyun" + CTA'lar), 4 özellik kartı, iletişim çağrısı, footer. Misafir/üyeye göre kişiselleşiyor.
+2. **Navigasyon refactor**: `/giris` ve `/kayit` artık doğrudan AuthUnified render ediyor (eskiden `/?tab=`'a redirect; ters çevrildi). TopBar markası `/oku`→`/`, "Giriş yap" `/`→`/giris`, nav'a "İletişim" linki eklendi.
+3. **İletişim sayfası** (`src/app/iletisim/`): `layout.tsx`, `page.tsx` (üyede ön-dolu), `ContactForm.tsx` (honeypot, başarı ekranı, `useToast`).
+4. **`POST /api/contact`**: doğrulama, honeypot, `rateLimit` (IP başına saatte 5), `ContactMessage` create, `sendContactNotification` (Resend).
+5. **`ContactMessage` modeli** (`prisma/schema.prisma`): name/email/subject/body/userId(snapshot)/ipHash(tuzlu)/readAt/createdAt.
+6. **Yönetici "İletişim" sekmesi** (panel artık 6 sekme): `IletisimTab.tsx`, `api/admin/contact` (GET/PATCH/DELETE, ADMIN korumalı, `recordAudit`).
+7. **SEO/env**: `sitemap.ts`'e `/iletisim`; `.env.example`'a `CONTACT_EMAIL` notu.
+
+tsc/lint/build temiz. `ContactMessage` tablosu production Neon'a push edildi; canlıda uçtan uca doğrulandı.
+
+---
+
+### 2026-06-06 (7. iş) — Mobil uyumluluk
+
+Kullanıcı sitenin mobil için uyumlu hale getirilmesini, önce tam analiz yapılmasını istedi. Asıl sorun okuyucu sayfasıydı: masaüstünde 3 sütunlu grid mobilde alt alta diziliyor, "Sıradaki" butonu sayfanın en altında erişilemez oluyordu. Arapça kelime tooltip'i sadece hover ile açıldığından dokunmatik cihazlarda çalışmıyordu.
+
+**Onaylanan tasarım:** mobil okuyucu = alt sekme çubuğu (Tefsirler · Metin · Araçlar), varsayılan Metin açık. Masaüstü düzeni aynen korundu.
+
+**Uygulananlar:**
+1. **Okuyucu mobil sekmeli düzen** (`TafsirReader.tsx`): `mobilePane` state; kök grid mobilde tek sütun, her bölme `hidden/block` + `md:block`; alta sabit sekme çubuğu; tefsir seçilince otomatik Metin sekmesine geçiş.
+2. **Arapça tooltip dokunmatik** (`AyahArabicWithTooltip` + `AyahWordBridge`): toggle aç/kapat, dışarı dokununca kapanır.
+3. **Sticky başlık mobilde kompakt** (`AyahStickyHeader`): kaydırınca Arapça+meal gizlenip okuma alanı açılıyor.
+4. **viewport export** (`layout.tsx`): device-width + tema rengi `#065f46`.
+5. **"En üste çık" butonu** (`ScrollToTopButton`): mobilde sekme çubuğunun üstüne kaldırıldı.
+
+tsc/lint/build temiz; dev sunucuda SSR çıktısı doğrulandı.
+
+---
+
+### 2026-06-06 (6. iş) — Performans: bölge + sorgu paralelleştirme + tefsir SSR seed
+
+Kullanıcı sitenin genel hızlanmasını istedi. Tahmin yerine önce ölçüm yapıldı (`scripts/perf-measure.ts`).
+
+**Ölçüm bulguları:**
+- **Asıl darboğaz: ağ gecikmesi / bölge uyumsuzluğu.** Her DB sorgusu 7-19 ms'de bitiyor ama toplam round-trip ~480 ms. Sebep: Neon eu-central-1 (Frankfurt), Vercel fonksiyonları varsayılan iad1 (ABD) → Atlantik ötesi ~95 ms her sorgu.
+- Okuyucu sayfası 5-6 sorguyu seri yapıyor; tefsir açılışı 2-3 round-trip daha.
+
+**Uygulananlar:**
+1. **`vercel.json` → `regions: ["fra1"]`** (Frankfurt, Neon ile aynı bölge). En yüksek etki.
+2. **Okuyucu sorgu optimizasyonu** (`src/lib/reader-data.ts`): React `cache` ile dedupe; `Promise.all`; `unstable_cache` (1 gün, `surahs` tag).
+3. **Tefsir SSR seed**: varsayılan tefsir metni sayfayla birlikte sunucuda render → açılışta metin anında görünür.
+
+tsc/lint/build temiz.
+
+---
+
+### 2026-06-06 (5. iş) — SEO III: sitelinks arama kutusu + iç bağlantı + noindex hijyeni
+
+(Not: 4. iş sonrası OG fontu top-level fs okuması Vercel'de tüm siteyi 500 yapmıştı; commit e917b57 ile font CDN'den lazy fetch'e çevrilip çözüldü.)
+
+- **Sitelinks arama kutusu (SearchAction)**: WebSite JSON-LD'ye `potentialAction` SearchAction (`/arama?q={search_term_string}`) eklendi. Arama sayfası mount'ta `?q=` okuyup aramayı otomatik tetikliyor (deep-link).
+- **İç bağlantı (taranabilir gezinme)**: Okuyucu sayfasının altına server-render `<nav>` — breadcrumb + önceki/sonraki ayet linkleri (`rel=prev/next`). Googlebot bu zinciri izleyerek tüm ayet sayfalarını keşfeder.
+- **İnce sayfa hijyeni**: Sadeleştirilmiş içeriği olmayan ayet sayfaları `robots: noindex, follow`.
+- tsc/lint/build temiz; yerelde doğrulandı.
+
+---
+
 ### 2026-06-06 (4. iş) — SEO II: OG görselleri, JSON-LD, Search Console
 
 Görünürlük çalışmasının ikinci dalgası:
