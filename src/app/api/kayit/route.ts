@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/email";
+import { validatePasswordAgainstEmail } from "@/lib/password-policy";
 
 export async function POST(req: NextRequest) {
   const { email, password, name } = (await req.json()) as {
@@ -22,8 +23,9 @@ export async function POST(req: NextRequest) {
   if (!EMAIL_RE.test(normalized)) {
     return NextResponse.json({ error: "Geçerli bir e-posta adresi girin." }, { status: 400 });
   }
-  if (password.length < 8) {
-    return NextResponse.json({ error: "Şifre en az 8 karakter olmalı." }, { status: 400 });
+  const passwordCheck = validatePasswordAgainstEmail(password, normalized);
+  if (!passwordCheck.ok) {
+    return NextResponse.json({ error: passwordCheck.error }, { status: 400 });
   }
 
   const existing = await prisma.user.findUnique({ where: { email: normalized } });

@@ -4,6 +4,11 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REQUIREMENTS_HINT,
+  validatePasswordAgainstEmail,
+} from "@/lib/password-policy";
 
 type AuthTab = "giris" | "kayit";
 
@@ -192,12 +197,13 @@ function RegisterForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (password.length < 8) {
-      setError("Şifre en az 8 karakter olmalı.");
-      return;
-    }
     if (password !== password2) {
       setError("Şifreler eşleşmiyor.");
+      return;
+    }
+    const passwordCheck = validatePasswordAgainstEmail(password, email);
+    if (!passwordCheck.ok) {
+      setError(passwordCheck.error);
       return;
     }
     setLoading(true);
@@ -252,22 +258,25 @@ function RegisterForm() {
         />
       </div>
       <div>
-        <label className="block text-sm mb-1">Şifre (en az 8 karakter)</label>
+        <label className="block text-sm mb-1">Şifre</label>
         <input
           type="password"
           required
-          minLength={8}
+          minLength={PASSWORD_MIN_LENGTH}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full border rounded-lg px-3 py-2 bg-white/70 dark:bg-stone-900/60 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
         />
+        <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+          {PASSWORD_REQUIREMENTS_HINT}
+        </p>
       </div>
       <div>
         <label className="block text-sm mb-1">Şifre tekrarı</label>
         <input
           type="password"
           required
-          minLength={8}
+          minLength={PASSWORD_MIN_LENGTH}
           value={password2}
           onChange={(e) => setPassword2(e.target.value)}
           className={`w-full border rounded-lg px-3 py-2 bg-white/70 dark:bg-stone-900/60 focus:ring-2 focus:ring-emerald-500/20 outline-none transition ${

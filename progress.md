@@ -7,6 +7,21 @@
 
 ## 📅 Revizyon Geçmişi
 
+### [2026-06-13] — Şifre politikası güçlendirildi ✅
+
+- Yalnızca 8 karakter kontrolü yerine merkezi `password-policy` modülü eklendi
+- Kayıt, şifre sıfırlama, profil şifre değişimi API + formları güncellendi
+- Harf + rakam zorunluluğu, yaygın şifre listesi, e-posta benzerliği ve tekrarlayan karakter reddi
+
+**Değiştirilen Dosyalar:**
+- `src/lib/password-policy.ts` (yeni)
+- `src/app/api/kayit/route.ts`, `src/app/api/auth/reset-password/route.ts`, `src/app/api/my/password/route.ts`
+- `src/components/AuthUnified.tsx`, `src/app/profil/page.tsx`, `src/app/sifre-sifirla/[token]/page.tsx`
+
+**Sonraki Adımlar:**
+- [ ] FavoriteTafsir DB migration
+- [ ] İsteğe bağlı: mevcut zayıf şifreler için girişte yenileme zorunluluğu
+
 ### 2026-06-10 (17. iş) — Çok-ajan ortak hafıza altyapısı kuruldu ✅
 
 - AGENTS.md okundu; Claude Code / Codex / Gemini CLI / Antigravity CLI ortak çalışma protokolü incelendi

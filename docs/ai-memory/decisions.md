@@ -24,3 +24,6 @@ Shell'de miras kalan `file:./dev.db` SQLite URL tuzağını önlemek için tüm 
 
 ## 2026-06-08 — FavoriteTafsir modeli (15. iş)
 `prisma/schema.prisma`'ya FavoriteTafsir modeli eklendi (userId + tafsirId, unique). API route `/api/my/favorite-tafsirs`. ⚠️ Production Neon'a henüz push edilmedi.
+
+## 2026-06-13 — Merkezi şifre politikası
+Tek noktadan doğrulama (`src/lib/password-policy.ts`); sunucu tarafında zorunlu, istemcide erken geri bildirim. Min 8 karakter + harf + rakam; yaygın şifre ve e-posta benzerliği reddi. Mevcut kullanıcı şifreleri geriye dönük zorlanmaz — yalnızca yeni kayıt, sıfırlama ve değiştirme akışlarında geçerli.

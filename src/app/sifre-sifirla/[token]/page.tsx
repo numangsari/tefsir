@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REQUIREMENTS_HINT,
+  validatePassword,
+} from "@/lib/password-policy";
 
 export default function ResetPasswordPage() {
   const { token } = useParams<{ token: string }>();
@@ -17,6 +22,11 @@ export default function ResetPasswordPage() {
     setError(null);
     if (password !== password2) {
       setError("Şifreler eşleşmiyor.");
+      return;
+    }
+    const passwordCheck = validatePassword(password);
+    if (!passwordCheck.ok) {
+      setError(passwordCheck.error);
       return;
     }
     setLoading(true);
@@ -59,7 +69,7 @@ export default function ResetPasswordPage() {
               Yeni şifre belirle
             </h1>
             <p className="text-stone-500 dark:text-stone-400 text-sm mb-6">
-              En az 8 karakter içeren yeni şifrenizi girin.
+              {PASSWORD_REQUIREMENTS_HINT}
             </p>
             <form onSubmit={submit} className="space-y-4">
               <div>
@@ -67,7 +77,7 @@ export default function ResetPasswordPage() {
                 <input
                   type="password"
                   required
-                  minLength={8}
+                  minLength={PASSWORD_MIN_LENGTH}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full border rounded-md px-3 py-2 bg-white dark:bg-stone-800 border-stone-300 dark:border-stone-700"
@@ -78,7 +88,7 @@ export default function ResetPasswordPage() {
                 <input
                   type="password"
                   required
-                  minLength={8}
+                  minLength={PASSWORD_MIN_LENGTH}
                   value={password2}
                   onChange={(e) => setPassword2(e.target.value)}
                   className={`w-full border rounded-md px-3 py-2 bg-white dark:bg-stone-800 ${

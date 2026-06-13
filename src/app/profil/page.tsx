@@ -6,6 +6,11 @@ import { signOutCompletely } from "@/lib/sign-out";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/Toaster";
 import { TAFSIRS } from "@/data/tafsirs";
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REQUIREMENTS_HINT,
+  validatePasswordAgainstEmail,
+} from "@/lib/password-policy";
 
 type Profile = {
   id: string;
@@ -135,6 +140,17 @@ export default function ProfilePage() {
     if (next !== next2) {
       setPwErr("Yeni şifreler eşleşmiyor.");
       return;
+    }
+    if (curr === next) {
+      setPwErr("Yeni şifre mevcut şifrenizle aynı olamaz.");
+      return;
+    }
+    if (p) {
+      const passwordCheck = validatePasswordAgainstEmail(next, p.email);
+      if (!passwordCheck.ok) {
+        setPwErr(passwordCheck.error);
+        return;
+      }
     }
     setPwLoading(true);
     const r = await fetch("/api/my/password", {
@@ -321,6 +337,7 @@ export default function ProfilePage() {
       {/* Şifre */}
       <section className="surface-glass !rounded-xl p-5">
         <h2 className="font-medium mb-3 text-stone-800 dark:text-stone-100">Şifre değiştir</h2>
+        <p className="text-xs text-stone-500 dark:text-stone-400 mb-3">{PASSWORD_REQUIREMENTS_HINT}</p>
         <form onSubmit={changePassword} className="space-y-3 max-w-sm">
           <input
             type="password"
@@ -334,9 +351,9 @@ export default function ProfilePage() {
             type="password"
             value={next}
             onChange={(e) => setNext(e.target.value)}
-            placeholder="Yeni şifre (en az 8)"
+            placeholder="Yeni şifre"
             required
-            minLength={8}
+            minLength={PASSWORD_MIN_LENGTH}
             className="w-full border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
           />
           <input
@@ -345,7 +362,7 @@ export default function ProfilePage() {
             onChange={(e) => setNext2(e.target.value)}
             placeholder="Yeni şifre (tekrar)"
             required
-            minLength={8}
+            minLength={PASSWORD_MIN_LENGTH}
             className="w-full border rounded-lg px-3 py-2 text-sm bg-white/70 dark:bg-stone-800/70 border-stone-300 dark:border-stone-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition"
           />
           {pwErr && <p className="text-sm text-red-700 dark:text-red-400">{pwErr}</p>}
