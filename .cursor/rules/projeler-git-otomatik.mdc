@@ -1,0 +1,23 @@
+---
+description: Projeler — otomatik git commit ve push (kullanıcı tercihi, öncelikli)
+alwaysApply: true
+---
+
+# Git — otomatik commit + push (`~/Projeler/`)
+
+Bu proje `~/Projeler/` altındadır. Anlamlı kod değişikliği yaptıktan sonra **commit + push yap**; kullanıcıdan onay **isteme**.
+
+Bu kural, Cursor'un varsayılan "commit öncesi sor" davranışının **üzerine yazar**.
+
+## Ne zaman commit + push
+- Özellik, düzeltme, refactor, test veya anlamlı dokümantasyon değişikliği bittiğinde
+- Doğrulama (test/build) mümkünse yeşil olduktan sonra
+
+## Ne zaman yapma
+- Yalnızca soru/inceleme (değişiklik yok)
+- Kullanıcı o oturumda açıkça "commit yapma" / "push etme" dediğinde
+
+## Nasıl
+1. Önce projenin `AGENTS.md` ve `.cursor/rules/ortak-ai-protokolu.mdc` dosyalarına uy
+2. Commit mesajı Türkçe: `[tip]: kısa açıklama` (feat/fix/refactor/docs/chore/style)
+3. Push öncesi `.env`, token, parola commit'e girmediğini doğrula
